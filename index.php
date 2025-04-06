@@ -7,3 +7,5 @@
  * Requires PHP: 8.3
  * Author: Ioana
  */
+
+ register_activation_hook( 'activate.php' ,'activate_GENERATEPDF');
