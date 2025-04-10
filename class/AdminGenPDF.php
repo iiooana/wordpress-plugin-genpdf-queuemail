@@ -31,7 +31,7 @@ class AdminGenPDF
     }
 
     public function genpdf_data_page()
-    {
+    {       
         $forms_query = new WP_Query([
             'post_type' => 'wpcf7_contact_form',
             'post_per_page' => -1
@@ -39,6 +39,11 @@ class AdminGenPDF
         //genpdf_vardie($the_query);
         $form_id_selected = null;
         if (!empty($_REQUEST['page']) && $_REQUEST['page'] == 'genpdf_data' && !empty($_REQUEST['contact_form_id']) && is_numeric($_REQUEST['contact_form_id'])) {
+            //check CSRF
+            if(!isset($_REQUEST['genpdf_wpnonce']) || !wp_verify_nonce($_REQUEST['genpdf_wpnonce'],'genpdf_select_form')){
+                echo "Your wpnonce is not valid.";
+                die();               
+            }
             //genpdf_vardie($_REQUEST);
             $form_id_selected =  $_REQUEST['contact_form_id'];
         }
@@ -48,7 +53,7 @@ class AdminGenPDF
             <? if ($forms_query->have_posts()) { ?>
                 <form id="form_genpdf_data_page" method="get">
                     <input type="hidden" name="page" value="genpdf_data">
-                    <label>Seleziona il form: </label>
+                    <?= wp_nonce_field( 'genpdf_select_form','genpdf_wpnonce') ?>
                     <select name="contact_form_id" onchange="document.getElementById('form_genpdf_data_page').submit()" required>
                         <option value=""></option>
                         <? while ($forms_query->have_posts()) {
