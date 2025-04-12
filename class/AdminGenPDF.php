@@ -50,7 +50,7 @@ class AdminGenPDF
         }
 ?>
         <div class="wrap">
-            <h1 class="wp-heading-inline">Iscrizioni ricevute</h1>
+            <h1 class="wp-heading-inline"><?=__('Iscrizioni sito vecchio ricevute','genpdf-woocommerce')?></h1>
             <? if ($forms_query->have_posts()) { ?>
                 <form id="form_genpdf_data_page" method="get">
                     <input type="hidden" name="page" value="genpdf_data">

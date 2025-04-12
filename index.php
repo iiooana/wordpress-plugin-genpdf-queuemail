@@ -25,5 +25,6 @@ function genpdf_vardie(){
 register_activation_hook(__FILE__ ,'genpdf_active');
 
 add_action('plugins_loaded', function() {    
+    load_plugin_textdomain('genpdf-woocommerce',false,dirname(plugin_basename(__FILE__)) . '/languages');
     new \GenPDF\Admin\AdminGenPDF();
 });

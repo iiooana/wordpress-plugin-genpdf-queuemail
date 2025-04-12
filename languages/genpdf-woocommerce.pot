@@ -1,0 +1,38 @@
+# Copyright (C) 2025 Ioana
+# This file is distributed under the same license as the Generate PDF plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Generate PDF 0.2.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/genpdf-woocommerce\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-04-12T12:44:21+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.11.0\n"
+"X-Domain: genpdf-woocommerce\n"
+
+#. Plugin Name of the plugin
+#: index.php
+msgid "Generate PDF"
+msgstr ""
+
+#. Description of the plugin
+#: index.php
+msgid "Generate PDF from orders and send emails in a queue. This plugin is customized to be compatible with \"Contact Form Entries\"."
+msgstr ""
+
+#. Author of the plugin
+#: index.php
+msgid "Ioana"
+msgstr ""
+
+#: class/AdminGenPDF.php:23
+msgid "Subscription old website"
+msgstr ""
+
+#: class/AdminGenPDF.php:24
+msgid "Subs. old website"
+msgstr ""

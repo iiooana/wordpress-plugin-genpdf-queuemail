@@ -1,4 +1,4 @@
-# PLUGIN THAT GENERATE PDF
+# 1. PLUGIN THAT GENERATE PDF
 
 This plugin sets the scheme of templates and courses in the database.
 The goal is to generate a PDF with dynamic data.
@@ -9,3 +9,18 @@ TODO
 - translate
 - verify wpnonce
 - remove voice from menu of vxcf 
+
+
+## 1.1. TRANSLATE USGIN i18n
+Requirements:
+    - wp cli
+
+Steps:
+<ol>
+    <li>Add Text Domain and Domain Path as comment for your plugin.</li>
+    <li>Create the template file <strong>.pot</strong>, go into folder or you plugin plugins/myplugin and then: <strong>wp i18n make-pot. </strong></li>
+    <li>We need to create the file <strong>.mo</strong>: msgfmt -o file-it_IT.mo file-
+it_IT.po 
+    </li>
+    <li>Add load_plugin_textdomain() on plugins_loaded</li>
+</ol>
