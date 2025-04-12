@@ -20,18 +20,19 @@ class AdminGenPDF
     public function addMenu()
     {
         add_menu_page(
-            'Iscrizioni',
-            'Iscrizioni',
+            __('Subscription old website','genpdf-woocommerce'),
+            __('Subs. old website','genpdf-woocommerce'),
             'manage_options',
             'genpdf_data',
-            [$this, 'genpdf_data_page'],
+            [$this, 'old_subscriptions'],
             $this->icon(),
             10
         );
+       
     }
 
-    public function genpdf_data_page()
-    {       
+    public function old_subscriptions()
+    {        
         $forms_query = new WP_Query([
             'post_type' => 'wpcf7_contact_form',
             'post_per_page' => -1
@@ -79,5 +80,18 @@ class AdminGenPDF
             <? } ?>
         </div>
 <?
+    }
+
+    public function genpdf_test(){
+        //_genpdf_course_id
+        if(!empty($_REQUEST['id_lead'])){
+            var_dump($_REQUEST['id_lead']);
+            
+        }
+        ?>
+        <div class="wrap">
+            <h1 class="wp-heading-line">Test iscrizione</h1>    
+        </div>
+        <?
     }
 }
