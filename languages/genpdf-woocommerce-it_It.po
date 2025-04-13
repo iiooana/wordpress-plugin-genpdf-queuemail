@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-04-12T12:44:21+00:00\n"
+"POT-Creation-Date: 2025-04-12T15:26:37+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: genpdf-woocommerce\n"
@@ -30,9 +30,13 @@ msgid "Ioana"
 msgstr ""
 
 #: class/AdminGenPDF.php:23
-msgid "Subscription old website"
-msgstr "Iscrizioni sito vecchio"
+msgid "Subscriptions from old website"
+msgstr "Iscrizioni dal sito vecchio"
 
 #: class/AdminGenPDF.php:24
 msgid "Subs. old website"
 msgstr "Iscr. sito vecchio"
+
+#: class/AdminGenPDF.php:53
+msgid "Subscriptions received from the old website"
+msgstr "Iscrizioni ricevute dal sito vecchio"
