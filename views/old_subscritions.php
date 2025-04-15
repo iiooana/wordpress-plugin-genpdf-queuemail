@@ -78,7 +78,7 @@ if (!empty($_REQUEST['page'])
                     <input type="hidden" name="n_page" value="<?= $current_page?>">
                     <? wp_nonce_field("genpdf_search", "genpdf_search_value") ?>
                     <input type="text" name="search" required value="<?=$subs->getSearch()?>">
-                    <button class="button"><?= __("search", "genpdf-woocomerce") ?></button>
+                    <button class="button"><?= __("search", "genpdf-woocommerce") ?></button>
                 </form>
                 <div class="tablenav" style="display: flex; align-items:center; gap: 5px;">
                     <span class="displaying-num"><?= $subs->getCount() ?> <?= __('items', 'genpdf-woocommerce') ?></span>
@@ -89,7 +89,7 @@ if (!empty($_REQUEST['page'])
                         <input type="hidden" name="search" required value="<?=$subs->getSearch()?>">
                         <button class="next-page button" <?=$current_page == 1 ? disabled:'' ?> title="<?= __('Go to page', 'genpdf-wocommerce') ?> <?= $current_page-1 ?>"><span aria-hidden="true">‹</span></button>
                     </form>
-                    <span><?=$current_page?> <?=__('of','genpdf-wocommcerce')?> <?=$max_page?></span>
+                    <span><?=$current_page?> <?=__('of','genpdf-woocommerce')?> <?=$max_page?></span>
                     <form action="?" method="get">
                         <input type="hidden" name="page" value="genpdf_data">
                         <input type="hidden" name="n_page" value="<?= $current_page + 1 ?>">

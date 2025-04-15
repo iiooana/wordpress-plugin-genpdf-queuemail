@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-04-12T15:26:37+00:00\n"
+"POT-Creation-Date: 2025-04-15T21:09:51+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: genpdf-woocommerce\n"
@@ -17,7 +17,7 @@ msgstr ""
 #. Plugin Name of the plugin
 #: index.php
 msgid "Generate PDF"
-msgstr ""
+msgstr "Generatore PDF"
 
 #. Description of the plugin
 #: index.php
@@ -37,6 +37,41 @@ msgstr "Iscrizioni dal sito vecchio"
 msgid "Subs. old website"
 msgstr "Iscr. sito vecchio"
 
-#: class/AdminGenPDF.php:53
+#: views/old_subscritions.php:15
 msgid "Subscriptions received from the old website"
-msgstr "Iscrizioni ricevute dal sito vecchio"
+msgstr "Iscrizioni ricevute dal vecchio sito"
+
+#: views/old_subscritions.php:34
+msgid "date"
+msgstr "data"
+
+#: views/old_subscritions.php:81
+msgid "search"
+msgstr "cerca"
+
+#: views/old_subscritions.php:84
+msgid "items"
+msgstr "element"
+
+#: views/old_subscritions.php:92
+msgid "of"
+msgstr "di"
+
+#: views/old_subscritions.php:109
+#: views/old_subscritions.php:132
+msgid "First name"
+msgstr "Nome"
+
+#: views/old_subscritions.php:110
+#: views/old_subscritions.php:133
+msgid "Last name"
+msgstr "Cognome"
+
+#: views/old_subscritions.php:112
+#: views/old_subscritions.php:135
+msgid "Date"
+msgstr "Data"
+
+#: views/old_subscritions.php:121
+msgid "View"
+msgstr "Visualizza"

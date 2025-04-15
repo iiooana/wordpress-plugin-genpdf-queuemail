@@ -17,7 +17,7 @@ Requirements: wp cli
 Steps:
 <ol>
     <li>Add Text Domain and Domain Path as comment for your plugin.</li>
-    <li>Create the template file <strong>.pot</strong>, go into folder or you plugin plugins/myplugin and then: <strong>wp i18n make-pot. </strong></li>
+    <li>Create the template file <strong>.pot</strong>, go into folder or you plugin plugins/myplugin and then: <strong>wp i18n make-pot . </strong></li>
     <li>Copy the file from genpdf-woocommerce.pot to genpdf-woocommerce-{lang}.po</li>
     <li>We need to create the file <strong>.mo</strong>: msgfmt -o file-it_IT.mo file-
 it_IT.po 

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-04-12T15:26:37+00:00\n"
+"POT-Creation-Date: 2025-04-15T21:23:02+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: genpdf-woocommerce\n"
@@ -37,6 +37,41 @@ msgstr ""
 msgid "Subs. old website"
 msgstr ""
 
-#: class/AdminGenPDF.php:53
+#: views/old_subscritions.php:15
 msgid "Subscriptions received from the old website"
+msgstr ""
+
+#: views/old_subscritions.php:34
+msgid "date"
+msgstr ""
+
+#: views/old_subscritions.php:81
+msgid "search"
+msgstr ""
+
+#: views/old_subscritions.php:84
+msgid "items"
+msgstr ""
+
+#: views/old_subscritions.php:92
+msgid "of"
+msgstr ""
+
+#: views/old_subscritions.php:109
+#: views/old_subscritions.php:132
+msgid "First name"
+msgstr ""
+
+#: views/old_subscritions.php:110
+#: views/old_subscritions.php:133
+msgid "Last name"
+msgstr ""
+
+#: views/old_subscritions.php:112
+#: views/old_subscritions.php:135
+msgid "Date"
+msgstr ""
+
+#: views/old_subscritions.php:121
+msgid "View"
 msgstr ""
