@@ -1,6 +1,8 @@
 <?php
-
 function genpdf_active(){
+  //silent is gold
+}
+function genpdf_active_old(){
   //Check if tables exits or not
   global $wpdb;
   $prefix = $wpdb->base_prefix.GenPDF::PREFIX_TABLE;
