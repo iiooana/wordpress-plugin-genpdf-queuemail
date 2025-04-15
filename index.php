@@ -13,8 +13,8 @@
 require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 require_once plugin_dir_path(__FILE__) .'activate.php';
 require_once plugin_dir_path(__FILE__) .'class/GenPDF.php';
+require_once plugin_dir_path(__FILE__) .'class/OldSubGenPDF.php';
 require_once plugin_dir_path(__FILE__) .'class/AdminGenPDF.php';
-require_once plugin_dir_path(__FILE__) .'class/SubscriptionGenPDF.php';
 
 function genpdf_vardie(){
     echo "<pre>";
@@ -22,9 +22,14 @@ function genpdf_vardie(){
     die();
     
 }
+function genpdf_getPath(){
+    return  plugin_dir_path(__FILE__);
+}
+
+
 register_activation_hook(__FILE__ ,'genpdf_active');
 
 add_action('plugins_loaded', function() {    
-    load_plugin_textdomain('genpdf-woocommerce',false,dirname(plugin_basename(__FILE__)) . '/languages');
-    new \GenPDF\Admin\AdminGenPDF();
+    load_plugin_textdomain('genpdf-woocommerce',false, genpdf_getPath(). '/languages');
+    new \GenPDF\AdminGenPDF();
 });
