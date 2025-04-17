@@ -15,6 +15,8 @@ require_once plugin_dir_path(__FILE__) .'activate.php';
 require_once plugin_dir_path(__FILE__) .'class/GenPDF.php';
 require_once plugin_dir_path(__FILE__) .'class/OldSubGenPDF.php';
 require_once plugin_dir_path(__FILE__) .'class/AdminGenPDF.php';
+require_once plugin_dir_path(__FILE__) .'class/TemplateGenPDF.php';
+require_once plugin_dir_path(__FILE__) .'class/OrderGenPDF.php';
 
 function genpdf_vardie(){
     echo "<pre>";

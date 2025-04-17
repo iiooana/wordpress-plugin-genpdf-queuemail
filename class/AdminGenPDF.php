@@ -2,8 +2,9 @@
 
 namespace GenPDF;
 
+use GenPDF\OrderGenPDF;
 use GenPDF\OldSubGenPDF;
-use WP_Query;
+
 
 class AdminGenPDF
 {
@@ -28,6 +29,15 @@ class AdminGenPDF
             $this->icon(),
             10
         );
+        add_menu_page(
+            'Test',
+            'test',
+            'manage_options',
+            'genpdf_test',
+            [$this,'test_page'],
+            $this->icon(),
+            10
+        ) ;
        
     }
 
@@ -37,5 +47,13 @@ class AdminGenPDF
             $subs = new OldSubGenPDF();
             include_once(genpdf_getPath().'/views/old_subscritions.php');
         }      
-    }    
+    }  
+    public function test_page(){
+        if(!empty($_REQUEST['template_id'])){
+
+        }
+        global $wpdb;
+        $order = new OrderGenPDF(18508);
+        genpdf_vardie($order->getPDF());
+    }  
 }

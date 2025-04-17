@@ -3,14 +3,14 @@ use GenPDF\GenPDF;
 function genpdf_active(){
   //Check if tables exits or not
   global $wpdb;
-  $prefix = $wpdb->base_prefix.GenPDF::PREFIX_TABLE;
+  $prefix = GenPDF::getFullPrefix();
 
   //table TEMPLATES
   $table = $prefix."_templates";
   maybe_create_table($table,"CREATE TABLE IF NOT EXISTS {$table} (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     name varchar(255) NOT NULL UNIQUE,
-    html TEXT,
+    html LONGTEXT,
     created_at DATETIME DEFAULT(CURTIME()),
     updated_at DATETIME,
     PRIMARY KEY (id)
