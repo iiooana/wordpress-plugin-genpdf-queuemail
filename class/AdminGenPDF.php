@@ -49,9 +49,6 @@ class AdminGenPDF
         }      
     }  
     public function test_page(){
-        if(!empty($_REQUEST['template_id'])){
-
-        }
         global $wpdb;
         $order = new OrderGenPDF(18508);
         genpdf_vardie($order->getPDF());
