@@ -1,16 +1,6 @@
 <? if (!is_admin()) {
     die("Access denied.");
 } ?>
-<?
-if (!empty($_REQUEST['page']) 
-&& $_REQUEST['page'] == 'genpdf_data' && !empty($_REQUEST['search'])
-&& !empty($_REQUEST['genpdf_search_value'])) {
-    if (wp_verify_nonce($_REQUEST['genpdf_search_value'], 'genpdf_search') === false) {
-        die("Your token is not valid.");
-    }
-    $subs->setSearch($_REQUEST['search']);
-}
-?>
 <div class="wrap">
     <h1 class="wp-heading-inline"><?= __('Subscriptions received from the old website', 'genpdf-woocommerce') ?></h1>
     <? if (!empty($_GET['page']) && $_GET['page'] == 'genpdf_data' && !empty($_GET['lead_id']) && is_numeric($_GET['lead_id'])) { ?>
