@@ -1,14 +1,14 @@
 <?php
 /*
  * Plugin Name: Generate PDF
- * Description: Generate PDF from orders and send emails in a queue. This plugin is customized to be compatible with "Contact Form Entries". 
- * Version: 0.2.0
+ * Description: Generate a PDF compiled of the order's data. View the history data of the "Contact Form Entries" plugin. 
+ * Version: 0.2.1
  * Author: Ioana
  * Text Domain: genpdf-woocommerce
  * Domain Path: /languages
+ * Requires PHP: 8.3
+ * Requires at least: 6.0 
  */
-
- //TODO ADD * Requires at least: 6.0 * Requires PHP: 8.3
 
 require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 require_once plugin_dir_path(__FILE__) .'activate.php';
