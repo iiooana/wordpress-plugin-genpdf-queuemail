@@ -26,7 +26,6 @@ function genpdf_getPath(){
     return  plugin_dir_path(__FILE__);
 }
 
-define('WP_DEBUG', true);
 register_activation_hook(__FILE__ ,'genpdf_active');
 
 add_action('plugins_loaded', function() {    

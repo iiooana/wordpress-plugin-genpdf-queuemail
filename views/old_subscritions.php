@@ -87,7 +87,7 @@ if (!empty($_REQUEST['page'])
                         <input type="hidden" name="n_page" value="<?= $current_page-1 ?>">
                         <? wp_nonce_field("genpdf_search", "genpdf_search_value") ?>
                         <input type="hidden" name="search" required value="<?=$subs->getSearch()?>">
-                        <button class="next-page button" <?=$current_page == 1 ? disabled:'' ?> title="<?= __('Go to page', 'genpdf-wocommerce') ?> <?= $current_page-1 ?>"><span aria-hidden="true">‹</span></button>
+                        <button class="next-page button" <?=$current_page == 1 ? 'disabled':'' ?> title="<?= __('Go to page', 'genpdf-wocommerce') ?> <?= $current_page-1 ?>"><span aria-hidden="true">‹</span></button>
                     </form>
                     <span><?=$current_page?> <?=__('of','genpdf-woocommerce')?> <?=$max_page?></span>
                     <form action="?" method="get">
@@ -95,7 +95,7 @@ if (!empty($_REQUEST['page'])
                         <input type="hidden" name="n_page" value="<?= $current_page + 1 ?>">
                         <? wp_nonce_field("genpdf_search", "genpdf_search_value") ?>
                         <input type="hidden" name="search" required value="<?=$subs->getSearch()?>">
-                        <button class="next-page button" <?=$current_page==$max_page ? disabled: '' ?> title="<?= __('Go to page', 'genpdf-wocommerce') ?> <?= $current_page + 1 ?>"><span aria-hidden="true">›</span></button>
+                        <button class="next-page button" <?=$current_page==$max_page ? 'disabled': '' ?> title="<?= __('Go to page', 'genpdf-wocommerce') ?> <?= $current_page + 1 ?>"><span aria-hidden="true">›</span></button>
                     </form>
                 </div>
 
