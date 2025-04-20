@@ -20,7 +20,7 @@ class AdminGenPDF
     }
     public function addMenu()
     {
-        add_menu_page(
+     /*   add_menu_page(
             __('Subscriptions from old website','genpdf-woocommerce'),
             __('Subs. old website','genpdf-woocommerce'),
             'manage_options',
@@ -28,7 +28,7 @@ class AdminGenPDF
             [$this, 'old_subscriptions'],
             $this->icon(),
             10
-        );
+        );*/
         add_menu_page(
             'Test',
             'test',
@@ -50,7 +50,7 @@ class AdminGenPDF
     }  
     public function test_page(){
         global $wpdb;
-        $order = new OrderGenPDF(18508);
+        $order = new OrderGenPDF(18657);
         genpdf_vardie($order->getPDF());
     }  
 }

@@ -18,16 +18,16 @@ class OrderGenPDF
     {
         global $wpdb;
         //region check if order exist
-        $table = $wpdb->base_prefix."wc_orders";
+        $table = $wpdb->base_prefix . "wc_orders";
         $query = $wpdb->prepare("SELECT 
             *
             FROM {$table}
-            where id =  %d limit 1",[$order_id]);
-        $row =  $wpdb->get_row($query,ARRAY_A);    
-        if(empty($row) || empty($row['id'])){
-            $message = var_export([ "message" => "The order_id does not exists.", "order_id" => $order_id],true);
+            where id =  %d limit 1", [$order_id]);
+        $row =  $wpdb->get_row($query, ARRAY_A);
+        if (empty($row) || empty($row['id'])) {
+            $message = var_export(["message" => "The order_id does not exists.", "order_id" => $order_id], true);
             error_log($message);
-            throw new \Exception($message,1003);
+            throw new \Exception($message, 1003);
         }
         $this->order = $row;
         //endregion
@@ -130,7 +130,7 @@ class OrderGenPDF
         '_billing_sdi'  
         )
         ", [$this->order_id]);
-       //genpdf_vardie($query);
+        //genpdf_vardie($query);
         $rows =  $wpdb->get_results($query, ARRAY_A);
         //genpdf_vardie($rows);
         if (!empty($rows)) {
@@ -138,7 +138,7 @@ class OrderGenPDF
                 // genpdf_vardie($item['meta_key']);
                 match ($item['meta_key']) {
                     "_billing_luogo_nascita" => $order_data['luogo_nascita'] = $item['meta_value'],
-                    "_billing_data_nascita" => $order_data['data_nascita'] = (!empty($item['meta_value']) ? date('d/m/Y',strtotime($item['meta_value'])):''),
+                    "_billing_data_nascita" => $order_data['data_nascita'] = (!empty($item['meta_value']) ? date('d/m/Y', strtotime($item['meta_value'])) : ''),
                     "_billing_cf" => $order_data['codice_fiscale'] = $item['meta_value'],
                     "_billing_professione" => $order_data['professione'] = $item['meta_value'],
                     //region company
@@ -148,21 +148,45 @@ class OrderGenPDF
                     "_billing_company_citty" => $order_data['azienda_citta'] = $item['meta_value'],
                     "_billing_company_cap" => $order_data['azienda_cap'] = $item['meta_value'],
                     "_billing_pec" => $order_data['azienda_pec'] = $item['meta_value'],
-                    "_billing_sdi" => $order_data['azienda_sdi'] = $item['meta_value']                  
+                    "_billing_sdi" => $order_data['azienda_sdi'] = $item['meta_value']
                     //endregion
                 };
             }
         }
 
-       // genpdf_vardie($order_data);
+        //genpdf_vardie($order_data);
         $order_data['note'] = $this->order['customer_note'];
         $order_data['metodo_pagamento'] = $this->order['payment_method_title'];
         //genpdf_vardie($this->order);        
-        if(!empty( $this->order['date_created_gmt'] )){
-            //sarebbe meglio campo nascosto
-            $year = intval(date('Y',strtotime($this->order['date_created_gmt'])));
-            $order_data['anno_accademico'] =  $year."/".($year+1);
+        if (!empty($this->order['date_created_gmt'])) {
+            //TODO ADD FIELD as metadata and after to db
+            $year = intval(date('Y', strtotime($this->order['date_created_gmt'])));
+            $order_data['anno_accademico'] =  $year . "/" . ($year + 1);
         }
+
+
+        //todo  html_tabella_import
+        /*
+<table>
+		<tr>
+			<td style="width: 16%;" class="destra">SCELGO IL CORSO:</td>
+			<td style="width: 16%;" class="destra">ACCONTO</td>
+			<td style="width: 16%;" class="destra">SETTEMBRE</td>
+			<td style="width: 16%;" class="destra">NOVEMBRE</td>
+			<td style="width: 16%;" class="destra">FEBBRAIO</td>
+			<td style="width: 16%;" class="destra">TOTALE</td>
+		</tr>
+		<tr>
+			<td style="width: 16%;" class="destra"><input type="checkbox" style="margin-top: 5px;padding: 0px;" checked>
+				BIOLOGIA UMANA</td>
+			<td style="width: 16%;" class="destra">€ 488,00</td>
+			<td style="width: 16%;" class="destra">€ 488,00</td>
+			<td style="width: 16%;" class="destra">€ 488,00</td>
+			<td style="width: 16%;" class="destra">€ 366,00</td>
+			<td style="width: 16%;">€ 1.830,00</td>
+		</tr>
+	</table>
+        */
 
         //region acconto o totale
         //$order_data['import_acconto'] = $row['company'];
@@ -170,6 +194,8 @@ class OrderGenPDF
         //endregion
 
         //region checked Padova - Verona
+        //luogo_del_corso
+        
         $order_data['checked_padova'] = '';
         $order_data['checked_verona'] = '';
         $order_data['luogo'] = '';

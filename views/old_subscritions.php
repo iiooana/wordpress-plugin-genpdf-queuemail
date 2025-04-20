@@ -1,5 +1,5 @@
 <? if (!is_admin()) {
-    die("Access denied.");
+    wp_die("Access denied.");
 } ?>
 <div class="wrap">
     <h1 class="wp-heading-inline"><?= __('Subscriptions received from the old website', 'genpdf-woocommerce') ?></h1>
@@ -44,7 +44,7 @@
     <? } else {
         if (!empty($_REQUEST['page']) && $_REQUEST['page'] == 'genpdf_data' && !empty($_REQUEST['search']) &&  !empty($_REQUEST['genpdf_search_value'])) {
             if (wp_verify_nonce($_REQUEST['genpdf_search_value'], 'genpdf_search') === false) {
-                die("Your token nonce is not valid.");
+                wp_die("Your token nonce is not valid.");
             }
             $subs->setSearch($_REQUEST['search']);
         }
@@ -52,7 +52,7 @@
         $max_page = $subs->getMaxNumberPages();
         if (!empty($_GET['n_page'])) {
             if (!is_numeric($_GET['n_page']) || intval($_GET['n_page']) > $max_page ) {
-                die("Page not valid");
+                wp_die("Page not valid");
             }
             $subs->setCurrentPage(intval($_GET['n_page']));
         }
