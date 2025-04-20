@@ -230,6 +230,9 @@ class OrderGenPDF
         return $order_data;
     }
 
+    /**
+     * @return table name of the model
+     */
     private function getTableName()
     {
         return GenPDF::getFullPrefix() . "_orders_template";
