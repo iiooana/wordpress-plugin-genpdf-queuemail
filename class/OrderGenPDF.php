@@ -74,10 +74,9 @@ class OrderGenPDF
     {
         global $wpdb;
         $order_data = [];
-
-        //region TODO font url and title
-        //endregion
-
+        $order_data['url_medium_font'] = plugin_dir_url('fonts/din_medium.ttf')."din_medium.ttf";
+        $order_data['url_din_light_font'] = plugin_dir_url('fonts/din_light.ttf')."din_light.ttf";
+   
         $table = $wpdb->base_prefix . "wc_order_addresses";
         $query = $wpdb->prepare("SELECT 
         first_name,
@@ -95,6 +94,7 @@ class OrderGenPDF
         if (!empty($row)) {
             $order_data['nome'] = ucfirst($row['first_name']);
             $order_data['cognome'] = ucfirst($row['last_name']);
+            $order_data['title'] = "#{$this->order_id} ".$order_data['nome'] ." ". $order_data['cognome'];
             $order_data['residente_in_via'] = $row['residente_in_via'];
             $order_data['residenza_civico'] = $row['residenza_civico'];
             $order_data['citta_residenza'] = $row['citta_residenza'] . (!empty($row['state']) ? ', ' . $row['state'] : '');
@@ -127,15 +127,16 @@ class OrderGenPDF
         '_billing_company_citty',
         '_billing_company_cap',
         '_billing_pec',
-        '_billing_sdi'  
+        '_billing_sdi',
+        'anno_accademico',
+        'giorno_generico_settimana',
+        'luogo_del_corso'
         )
         ", [$this->order_id]);
-        //genpdf_vardie($query);
         $rows =  $wpdb->get_results($query, ARRAY_A);
-        //genpdf_vardie($rows);
+
         if (!empty($rows)) {
             foreach ($rows as $item) {
-                // genpdf_vardie($item['meta_key']);
                 match ($item['meta_key']) {
                     "_billing_luogo_nascita" => $order_data['luogo_nascita'] = $item['meta_value'],
                     "_billing_data_nascita" => $order_data['data_nascita'] = (!empty($item['meta_value']) ? date('d/m/Y', strtotime($item['meta_value'])) : ''),
@@ -148,22 +149,17 @@ class OrderGenPDF
                     "_billing_company_citty" => $order_data['azienda_citta'] = $item['meta_value'],
                     "_billing_company_cap" => $order_data['azienda_cap'] = $item['meta_value'],
                     "_billing_pec" => $order_data['azienda_pec'] = $item['meta_value'],
-                    "_billing_sdi" => $order_data['azienda_sdi'] = $item['meta_value']
+                    "_billing_sdi" => $order_data['azienda_sdi'] = $item['meta_value'],
                     //endregion
+                    "anno_accademico" => $order_data['anno_accademico'] = $item['meta_value'],
+                    "giorno_generico_settimana" => !empty($item['meta_value']) ?  $order_data['giorno_generico_settimana'] = ucfirst($item['meta_value']) : '',
+                    "luogo_del_corso" =>  !empty($item['meta_value']) ?  $order_data['luogo_del_corso'] = $order_data['luogo'] = ucfirst($item['meta_value']) : '',
                 };
             }
-        }
-
-        //genpdf_vardie($order_data);
+        }    
         $order_data['note'] = $this->order['customer_note'];
         $order_data['metodo_pagamento'] = $this->order['payment_method_title'];
-        //genpdf_vardie($this->order);        
-        if (!empty($this->order['date_created_gmt'])) {
-            //TODO ADD FIELD as metadata and after to db
-            $year = intval(date('Y', strtotime($this->order['date_created_gmt'])));
-            $order_data['anno_accademico'] =  $year . "/" . ($year + 1);
-        }
-
+     
 
         //todo  html_tabella_import
         /*
@@ -195,25 +191,10 @@ class OrderGenPDF
 
         //region checked Padova - Verona
         //luogo_del_corso
-        
-        $order_data['checked_padova'] = '';
-        $order_data['checked_verona'] = '';
-        $order_data['luogo'] = '';
+
         $order_data['data'] = '';
         $order_data['firma'] = '';
         //endregion
-
-        $order_data['checked_weekend'] = '';
-        $order_data['checked_lunedi'] = '';
-
-        $order_data['checked_crediti'] = '';
-        $order_data['checked_contati'] = '';
-        $order_data['checked_bonifico'] = '';
-
-        $order_data['luogo'] = '';
-        $order_data['data'] = '';
-        $order_data['firma'] = '';
-
         //region checkbox
         $order_data['checked_newsletter_si'] = '';
         $order_data['checked_newsletter_no'] = '';
@@ -224,7 +205,6 @@ class OrderGenPDF
         $order_data['cheched_gruppo_cell_si'] = '';
         $order_data['cheched_gruppo_cell_no'] = '';
         //endregion
-
 
         //genpdf_vardie($query, $row, $order_data);
         return $order_data;

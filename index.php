@@ -104,6 +104,18 @@ function add_extra_order_meta($order_id)
                         ['%d', '%s', '%s']);
                     //endregion
 
+                    //region anno accademico
+                    $meta_value = get_field('anno_accademico', $id_product);
+                    $wpdb->insert(
+                        $wpdb->base_prefix . 'wc_orders_meta',
+                        [
+                            "order_id" => $order_id,
+                            "meta_key" => "anno_accademico",
+                            "meta_value" => $meta_value
+                        ],
+                        ['%d', '%s', '%s']);
+                    //endregion
+
                     //region importi mensili
                     $tabella_importi_prodotto = get_field('tabella_importo_mese', $id_product);
                     $mesi = [];
