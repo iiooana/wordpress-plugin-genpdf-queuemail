@@ -72,71 +72,35 @@ class OrderGenPDF
 
     private function getArrayData()
     {
-        global $wpdb;
         $order_data = [];
-        $order_data['url_medium_font'] = plugin_dir_url('fonts/din_medium.ttf')."din_medium.ttf";
-        $order_data['url_din_light_font'] = plugin_dir_url('fonts/din_light.ttf')."din_light.ttf";
-   
-        $table = $wpdb->base_prefix . "wc_order_addresses";
-        $query = $wpdb->prepare("SELECT 
-        first_name,
-        last_name,
-        address_1 as residente_in_via,
-        address_2 as residenza_civico,
-        city as citta_residenza,
-        state,
-        postcode as cap_residenza,
-        email,
-        phone,
-        company        
-        FROM {$table} WHERE order_id = %d LIMIT 1", [$this->order_id]);
-        $row = $wpdb->get_row($query, ARRAY_A);
-        if (!empty($row)) {
-            $order_data['nome'] = ucfirst($row['first_name']);
-            $order_data['cognome'] = ucfirst($row['last_name']);
-            $order_data['title'] = "#{$this->order_id} ".$order_data['nome'] ." ". $order_data['cognome'];
-            $order_data['residente_in_via'] = $row['residente_in_via'];
-            $order_data['residenza_civico'] = $row['residenza_civico'];
-            $order_data['citta_residenza'] = $row['citta_residenza'] . (!empty($row['state']) ? ', ' . $row['state'] : '');
-            $order_data['cap_residenza'] = $row['cap_residenza'];
-            $order_data['email'] = $row['email'];
-            $order_data['cell'] = $row['phone'];
+        $order_data['url_medium_font'] = plugin_dir_url('fonts/din_medium.ttf') . "din_medium.ttf";
+        $order_data['url_din_light_font'] = plugin_dir_url('fonts/din_light.ttf') . "din_light.ttf";
 
+        //region customer address
+        $customer_address = $this->getCustomerAddress();
+        if (!empty($customer_address)) {
+            $order_data['nome'] = !empty($customer_address['first_name']) ? ucfirst($customer_address['first_name']) : '';
+            $order_data['cognome'] = !empty($customer_address['last_name']) ? ucfirst($customer_address['last_name']) : '';
+            $order_data['title'] = "#{$this->order_id} " . $order_data['nome'] . " " . $order_data['cognome'];
+            $order_data['residente_in_via'] = $customer_address['residente_in_via'];
+            $order_data['residenza_civico'] = $customer_address['residenza_civico'];
+            $order_data['citta_residenza'] = $customer_address['citta_residenza'] . (!empty($customer_address['state']) ? ', ' . $customer_address['state'] : '');
+            $order_data['cap_residenza'] = $customer_address['cap_residenza'];
+            $order_data['email'] = $customer_address['email'];
+            $order_data['cell'] = $customer_address['phone'];
             //region company
-            if (!empty($row['company'])  && strlen(trim($row['company'])) > 0) {
-                $order_data['ragione_sociale'] = $row['company'];
+            if (!empty($customer_address['company'])  && strlen(trim($customer_address['company'])) > 0) {
+                $order_data['ragione_sociale'] = $customer_address['company'];
             }
             //endregion           
-
         }
-        $table = $wpdb->base_prefix . "wc_orders_meta";
-        $query = $wpdb->prepare("SELECT 
-        *
-        FROM {$table}
-        where 
-        order_id = %d
-        AND 
-        meta_key in (
-        '_billing_luogo_nascita',
-        '_billing_data_nascita',
-        '_billing_cf',
-        '_billing_professione',
-        '_billing_piva',
-        '_billing_company_address',
-        '_billing_company_address_number',
-        '_billing_company_citty',
-        '_billing_company_cap',
-        '_billing_pec',
-        '_billing_sdi',
-        'anno_accademico',
-        'giorno_generico_settimana',
-        'luogo_del_corso'
-        )
-        ", [$this->order_id]);
-        $rows =  $wpdb->get_results($query, ARRAY_A);
-
-        if (!empty($rows)) {
-            foreach ($rows as $item) {
+        //endregion
+       
+        //region order meta datas
+        $order_meta_datas =  $this->getOrderMetaData([ '_billing_luogo_nascita', '_billing_data_nascita','_billing_cf','_billing_professione','_billing_piva','_billing_company_address','_billing_company_address_number','_billing_company_citty','_billing_company_cap','_billing_pec','_billing_sdi','anno_accademico','giorno_generico_settimana','luogo_del_corso']);
+       // genpdf_vardie($order_meta_datas);
+        if (!empty($order_meta_datas)) {
+            foreach ($order_meta_datas as $item) {
                 match ($item['meta_key']) {
                     "_billing_luogo_nascita" => $order_data['luogo_nascita'] = $item['meta_value'],
                     "_billing_data_nascita" => $order_data['data_nascita'] = (!empty($item['meta_value']) ? date('d/m/Y', strtotime($item['meta_value'])) : ''),
@@ -156,44 +120,41 @@ class OrderGenPDF
                     "luogo_del_corso" =>  !empty($item['meta_value']) ?  $order_data['luogo_del_corso'] = $order_data['luogo'] = ucfirst($item['meta_value']) : '',
                 };
             }
-        }    
-        $order_data['note'] = $this->order['customer_note'];
-        $order_data['metodo_pagamento'] = $this->order['payment_method_title'];
-     
-
-        //todo  html_tabella_import
-        /*
-<table>
-		<tr>
-			<td style="width: 16%;" class="destra">SCELGO IL CORSO:</td>
-			<td style="width: 16%;" class="destra">ACCONTO</td>
-			<td style="width: 16%;" class="destra">SETTEMBRE</td>
-			<td style="width: 16%;" class="destra">NOVEMBRE</td>
-			<td style="width: 16%;" class="destra">FEBBRAIO</td>
-			<td style="width: 16%;" class="destra">TOTALE</td>
-		</tr>
-		<tr>
-			<td style="width: 16%;" class="destra"><input type="checkbox" style="margin-top: 5px;padding: 0px;" checked>
-				BIOLOGIA UMANA</td>
-			<td style="width: 16%;" class="destra">€ 488,00</td>
-			<td style="width: 16%;" class="destra">€ 488,00</td>
-			<td style="width: 16%;" class="destra">€ 488,00</td>
-			<td style="width: 16%;" class="destra">€ 366,00</td>
-			<td style="width: 16%;">€ 1.830,00</td>
-		</tr>
-	</table>
-        */
-
-        //region acconto o totale
-        //$order_data['import_acconto'] = $row['company'];
-        //$order_data['importo_totale'] = $row['company'];
+        }
         //endregion
 
-        //region checked Padova - Verona
-        //luogo_del_corso
+        $order_data['note'] = $this->order['customer_note'];
+        $order_data['metodo_pagamento'] = $this->order['payment_method_title'];
 
-        $order_data['data'] = '';
-        $order_data['firma'] = '';
+        //genpdf_vardie($this->order);
+        //region acconto or totale
+        if ($this->isAcconto()) {
+            $order_data['importo_acconto'] = number_format($this->order['total_amount'],2,",");
+            $totale = floatval($this->order['total_amount']);
+            //region month
+            $mesi_meta = $this->getOrderMetaData(['importo_mese']);    
+            if(!empty($mesi_meta) && !empty($mesi_meta[0]) &&!empty($mesi_meta[0]['meta_value']) ){
+                $mesi = json_decode($mesi_meta[0]['meta_value'],TRUE);       
+                $order_data['td_mesi_nome'] = '';
+                $order_data['td_mesi_importi'] = '';
+                foreach($mesi as $nome_mese => $price ){
+                    if( is_float($price) || is_numeric($price) ){
+                        $totale+=floatval($price);
+                        $order_data['td_mesi_nome'].= '<td style="width: 16%;" class="destra">'.strtoupper($nome_mese).'</td>';
+                        $order_data['td_mesi_importi'].= '<td style="width: 16%;" class="destra">€ '.number_format($price,2,",").'</td>';
+                    }
+                }
+            }
+            //endregion
+            $order_data['importo_totale'] = number_format($totale,2,",");
+        }else{
+            $order_data['importo_acconto'] = 0;
+            $order_data['importo_totale'] = number_format($this->order['total_amount'],2,",");
+        }
+        //endregion
+
+        $order_data['data'] = $this->order['date_created_gmt'] ? date('d/m/Y',strtotime($this->order['date_created_gmt'] )) : '';
+        $order_data['firma'] = '<img src="" width="20">';
         //endregion
         //region checkbox
         $order_data['checked_newsletter_si'] = '';
@@ -203,11 +164,67 @@ class OrderGenPDF
         $order_data['checked_riprese_no'] = '';
 
         $order_data['cheched_gruppo_cell_si'] = '';
-        $order_data['cheched_gruppo_cell_no'] = '';
+        $order_data['cheched_gruppo_cell_no '] = '';
         //endregion
 
         //genpdf_vardie($query, $row, $order_data);
         return $order_data;
+    }
+
+    /**
+     * @return an array with metadata of the order
+     */
+    private function getOrderMetaData(array|null $param_array = [] ){
+        global $wpdb;
+        $table = $wpdb->base_prefix . "wc_orders_meta";       
+        if(empty($param_array)){
+            $query = $wpdb->prepare("SELECT  * FROM {$table} where  order_id = %d", [$this->order_id]);
+        }else{
+            $placeholders = implode(',', array_fill(0,count($param_array),'%s'));
+            $query = $wpdb->prepare("SELECT * FROM {$table} WHERE order_id = %d AND meta_key in ($placeholders) ", array_merge([$this->order_id], $param_array) );
+        }
+        return $wpdb->get_results($query, ARRAY_A);
+    }
+
+    /**
+     * @return an array with customer info address
+     */
+    private function getCustomerAddress(){
+        global $wpdb;
+        $table = $wpdb->base_prefix . "wc_order_addresses";
+        $query = $wpdb->prepare("SELECT 
+        first_name,
+        last_name,
+        address_1 as residente_in_via,
+        address_2 as residenza_civico,
+        city as citta_residenza,
+        state,
+        postcode as cap_residenza,
+        email,
+        phone,
+        company        
+        FROM {$table} WHERE order_id = %d LIMIT 1", [$this->order_id]);
+        return $wpdb->get_row($query, ARRAY_A);
+    }
+    private function getSignedPath(){
+        $path = null;
+        //postmeta post_id => order_id and teh value is the image
+    }
+
+    /**
+     * @return true o false if the order and the only one product is "acconto" or not.
+     */
+    private function isAcconto()
+    {
+        global $wpdb;
+        $table = $wpdb->base_prefix . "wc_orders_meta";
+        $query = $wpdb->prepare("SELECT 
+        * FROM {$table} where  order_id = %d AND meta_key = %s ", [$this->order_id, 'acconto_o_totale']);
+        $row =  $wpdb->get_row($query, ARRAY_A);
+        if (!empty($row) && !empty($row['meta_value']) && strpos($row['meta_value'], 'acconto') !== false) {
+            return true;
+        }
+        return false;
     }
 
     /**

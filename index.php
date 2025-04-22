@@ -31,8 +31,12 @@ function genpdf_getPath()
     return  plugin_dir_path(__FILE__);
 }
 
+
 register_activation_hook(__FILE__, 'genpdf_active');
 
+/**
+ * Load the language, register new post type
+ */
 add_action('plugins_loaded', function () {
     load_plugin_textdomain('genpdf-woocommerce', false, dirname(plugin_basename(__FILE__)) . '/languages');
     new \GenPDF\AdminGenPDF();
@@ -41,6 +45,7 @@ add_action('plugins_loaded', function () {
 add_action('woocommerce_checkout_update_order_meta', 'add_extra_order_meta', 10, 1);
 /**
  * @param $order_id
+ * Save on DB meta data that are needed to PDF generation.
  */
 function add_extra_order_meta($order_id)
 {
@@ -60,7 +65,9 @@ function add_extra_order_meta($order_id)
         foreach ($products as $item) {
             //genpdf_vardie($item);
             $product = $item->get_product();
-            if (!empty($product) && !empty($product->get_parent_id())) {
+            if (!empty($product) && !empty($product->get_parent_id())) {              
+                //genpdf_vardie($product->attributes);
+                
                 //region giorno_generico_settimana
                 if( !empty($product->attributes['pa_data']) ){
                     $wpdb->insert(
@@ -71,6 +78,19 @@ function add_extra_order_meta($order_id)
                             "meta_value" => $product->attributes['pa_data']
                         ],
                         ['%d', '%s', '%s']);
+                }
+                //endregion
+
+                //region acconto or totale
+                if( !empty( $product->attributes['pa_pagamento'] ) ){
+                    $wpdb->insert(
+                        $wpdb->base_prefix . 'wc_orders_meta',
+                        [
+                            "order_id" => $order_id,
+                            "meta_key" => "acconto_o_totale",
+                            "meta_value" => $product->attributes['pa_pagamento']
+                        ],
+                        ['%d', '%s', '%s']);    
                 }
                 //endregion
 
@@ -155,7 +175,6 @@ function add_extra_order_meta($order_id)
 
                 }
             }
-            break;
         }
     }
     //endregion

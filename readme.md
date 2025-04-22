@@ -6,9 +6,10 @@ The goal is to generate a PDF with dynamic data.
 After that, I will create a queue to attach that PDF to emails.
 
 TODO
-- translate
-- verify wpnonce
-- remove voice from menu of vxcf 
+ - add plugin istruction
+ - meta data
+ - download pdf
+ - button download pdf
 
 
 ## 1.1. TRANSLATE USGIN i18n

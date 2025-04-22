@@ -50,7 +50,8 @@ class AdminGenPDF
     }  
     public function test_page(){
         global $wpdb;
-        $order = new OrderGenPDF(18657);
+   
+        $order = new OrderGenPDF(18825);
         genpdf_vardie($order->getPDF());
     }  
 }
