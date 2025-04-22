@@ -148,26 +148,40 @@ class OrderGenPDF
             //endregion
             $order_data['importo_totale'] = number_format($totale,2,",");
         }else{
-            $order_data['importo_acconto'] = 0;
+            $order_data['importo_acconto'] = 0; 
             $order_data['importo_totale'] = number_format($this->order['total_amount'],2,",");
         }
         //endregion
 
         $order_data['data'] = $this->order['date_created_gmt'] ? date('d/m/Y',strtotime($this->order['date_created_gmt'] )) : '';
-        $order_data['firma'] = '<img src="" width="20">';
-        //endregion
+        $signed_path = $this->getSignedPath();
+        if( !empty($signed_path)  && boolval($signed_path) ){
+            $order_data['firma'] = '<img src="'.$signed_path.'" width="300">';
+        }
+             
         //region checkbox
-        $order_data['checked_newsletter_si'] = '';
-        $order_data['checked_newsletter_no'] = '';
+        $checkbox_newsletter = $this->getOrderMetaData(['billing_newsletter']);
+        if(!empty($checkbox_newsletter) && !empty($checkbox_newsletter[0]) && !empty($checkbox_newsletter[0]['meta_value']) ){
+            $order_data['checked_newsletter_si'] = 'checked';
+        }else{
+            $order_data['checked_newsletter_no'] = 'checked';
+        }     
+     
+        $checkbox_riprese = $this->getOrderMetaData(['billing_shooting']);
+        if( !empty($checkbox_riprese) && !empty($checkbox_riprese[0]) && !empty($checkbox_riprese[0]['meta_value']) ){
+            $order_data['checked_riprese_si'] = 'checked';
+        }else{
+            $order_data['checked_riprese_no'] = 'checked';
+        }       
 
-        $order_data['checked_riprese_si'] = '';
-        $order_data['checked_riprese_no'] = '';
-
-        $order_data['cheched_gruppo_cell_si'] = '';
-        $order_data['cheched_gruppo_cell_no '] = '';
+        $checkbox_gruppo_cell = $this->getOrderMetaData(['billing_gruppo_cell']);
+        if( !empty($checkbox_gruppo_cell) && !empty($checkbox_gruppo_cell[0]) && !empty($checkbox_gruppo_cell[0]['meta_value']) ){
+            $order_data['cheched_gruppo_cell_si'] = 'checked';
+        }else{
+            $order_data['cheched_gruppo_cell_no '] = 'checked';
+        }
         //endregion
-
-        //genpdf_vardie($query, $row, $order_data);
+        
         return $order_data;
     }
 
@@ -206,9 +220,14 @@ class OrderGenPDF
         FROM {$table} WHERE order_id = %d LIMIT 1", [$this->order_id]);
         return $wpdb->get_row($query, ARRAY_A);
     }
+
     private function getSignedPath(){
-        $path = null;
-        //postmeta post_id => order_id and teh value is the image
+        global $wpdb;
+        $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM  wp_posts where ID = ( SELECT meta_id FROM `wp_postmeta` WHERE post_id=%d and meta_key=%s limit 1 ) AND post_type=%s "),[$this->order_id,'signpad','attachment']);
+        if(!empty($row) && !empty($row['guid']) && boolval($row['guid']) ){
+            return $row['guid'];
+        }
+        return null;
     }
 
     /**
