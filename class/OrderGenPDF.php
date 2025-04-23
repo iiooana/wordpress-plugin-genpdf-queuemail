@@ -223,7 +223,7 @@ class OrderGenPDF
 
     private function getSignedPath(){
         global $wpdb;
-        $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM  wp_posts where ID = ( SELECT meta_id FROM `wp_postmeta` WHERE post_id=%d and meta_key=%s limit 1 ) AND post_type=%s "),[$this->order_id,'signpad','attachment']);
+        $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM  wp_posts where ID = ( SELECT meta_value FROM `wp_postmeta` WHERE post_id=%d and meta_key=%s limit 1 ) AND post_type=%s "),[$this->order_id,'signpad','attachment']);
         if(!empty($row) && !empty($row['guid']) && boolval($row['guid']) ){
             return $row['guid'];
         }
