@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Generate PDF
  * Description: Generate a PDF compiled of the order's data. View the history data of the "Contact Form Entries" plugin. 
- * Version: 0.2.1
+ * Version: 0.2.3
  * Author: Ioana
  * Text Domain: genpdf-woocommerce
  * Domain Path: /languages

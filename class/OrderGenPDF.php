@@ -221,9 +221,13 @@ class OrderGenPDF
         return $wpdb->get_row($query, ARRAY_A);
     }
 
+    /**
+     * @return the url of the image path
+     */
     private function getSignedPath(){
         global $wpdb;
-        $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM  wp_posts where ID = ( SELECT meta_value FROM `wp_postmeta` WHERE post_id=%d and meta_key=%s limit 1 ) AND post_type=%s "),[$this->order_id,'signpad','attachment']);
+        $query = $wpdb->prepare("SELECT * FROM  wp_posts where ID = ( SELECT meta_value FROM `wp_postmeta` WHERE post_id=%d and meta_key=%s limit 1 ) AND post_type=%s limit 1 ",[$this->order_id,'signpad','attachment']);
+        $row = $wpdb->get_row($query,ARRAY_A);
         if(!empty($row) && !empty($row['guid']) && boolval($row['guid']) ){
             return $row['guid'];
         }
