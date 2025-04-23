@@ -4,7 +4,8 @@ namespace GenPDF;
 
 use GenPDF\OrderGenPDF;
 use GenPDF\OldSubGenPDF;
-
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class AdminGenPDF
 {
@@ -52,7 +53,23 @@ class AdminGenPDF
         global $wpdb;
         if(!empty($_REQUEST['order_id']) && is_numeric($_REQUEST['order_id']) ){
             $order = new OrderGenPDF(intval($_REQUEST['order_id']));
-            genpdf_vardie($order->getPDF());
+            ob_clean();           
+            // instantiate and use the dompdf class
+            $options_dompdf = new Options();
+            $options_dompdf->set('defaultFont', 'helvetica');
+            $options_dompdf->set('isRemoteEnabled', true); 
+            $dompdf = new Dompdf($options_dompdf);
+
+            $dompdf->loadHtml($order->getPDF());
+
+            // (Optional) Setup the paper size and orientation
+            $dompdf->setPaper('A4', 'portrait');
+
+            // Render the HTML as PDF
+            $dompdf->render();
+
+            // Output the generated PDF to Browser
+            $dompdf->stream();
         }        
         
     }  

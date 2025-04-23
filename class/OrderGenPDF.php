@@ -73,9 +73,6 @@ class OrderGenPDF
     private function getArrayData()
     {
         $order_data = [];
-        $order_data['url_medium_font'] = plugin_dir_url('fonts/din_medium.ttf') . "din_medium.ttf";
-        $order_data['url_din_light_font'] = plugin_dir_url('fonts/din_light.ttf') . "din_light.ttf";
-
         //region customer address
         $customer_address = $this->getCustomerAddress();
         if (!empty($customer_address)) {
@@ -156,7 +153,9 @@ class OrderGenPDF
         $order_data['data'] = $this->order['date_created_gmt'] ? date('d/m/Y',strtotime($this->order['date_created_gmt'] )) : '';
         $signed_path = $this->getSignedPath();
         if( !empty($signed_path)  && boolval($signed_path) ){
-            $order_data['firma'] = '<img src="'.$signed_path.'" width="300">';
+            $order_data['firma'] = '<img stlye="margin-left: 15px" src="'.$signed_path.'" width="240px">';
+        }else{
+            $order_data['firma'] = '___________________';
         }
              
         //region checkbox

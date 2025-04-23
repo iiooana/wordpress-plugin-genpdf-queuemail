@@ -19,6 +19,7 @@ require_once plugin_dir_path(__FILE__) . 'class/OldSubGenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'class/AdminGenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'class/TemplateGenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'class/OrderGenPDF.php';
+require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
 
 function genpdf_vardie()
 {
