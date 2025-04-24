@@ -77,7 +77,7 @@ class OrderGenPDF
         $order_data = [];
         $order_data['logo_pdf'] = $gen_pdf->getLogo() ?? '';
         //todo 
-        $order['titolo_corso_pdf'] = "LA LOGICA DELLA VITA: Biologia Umana";
+        $order_data['titolo_corso_pdf'] = "LA LOGICA DELLA VITA: Biologia Umana";
 
         //region customer address
         $customer_address = $this->getCustomerAddress();
