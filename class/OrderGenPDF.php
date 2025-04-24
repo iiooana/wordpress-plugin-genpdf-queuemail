@@ -72,7 +72,11 @@ class OrderGenPDF
 
     private function getArrayData()
     {
+        $gen_pdf = new GenPDF();
+
         $order_data = [];
+        $order_data['logo_pdf'] = $gen_pdf->getLogo() ?? '';
+
         //region customer address
         $customer_address = $this->getCustomerAddress();
         if (!empty($customer_address)) {
@@ -94,7 +98,7 @@ class OrderGenPDF
         //endregion
        
         //region order meta datas
-        $order_meta_datas =  $this->getOrderMetaData([ '_billing_luogo_nascita', '_billing_data_nascita','_billing_cf','_billing_professione','_billing_piva','_billing_company_address','_billing_company_address_number','_billing_company_citty','_billing_company_cap','_billing_pec','_billing_sdi','anno_accademico','giorno_generico_settimana','luogo_del_corso']);
+        $order_meta_datas =  $this->getOrderMetaData([ '_billing_luogo_nascita', '_billing_data_nascita','_billing_cf','_billing_professione','_billing_piva','_billing_company_address','_billing_company_address_number','_billing_company_citty','_billing_company_cap','_billing_pec','_billing_sdi','anno_accademico','giorno_generico_settimana','luogo_del_corso','titolo_corso_pdf']);
        // genpdf_vardie($order_meta_datas);
         if (!empty($order_meta_datas)) {
             foreach ($order_meta_datas as $item) {
@@ -115,6 +119,7 @@ class OrderGenPDF
                     "anno_accademico" => $order_data['anno_accademico'] = $item['meta_value'],
                     "giorno_generico_settimana" => !empty($item['meta_value']) ?  $order_data['giorno_generico_settimana'] = ucfirst($item['meta_value']) : '',
                     "luogo_del_corso" =>  !empty($item['meta_value']) ?  $order_data['luogo_del_corso'] = $order_data['luogo'] = ucfirst($item['meta_value']) : '',
+                    "titolo_corso_pdf" =>  $order_data['titolo_corso_pdf'] = $item['titolo_corso_pdf']
                 };
             }
         }
@@ -256,4 +261,5 @@ class OrderGenPDF
     {
         return GenPDF::getFullPrefix() . "_orders_template";
     }
+    
 }

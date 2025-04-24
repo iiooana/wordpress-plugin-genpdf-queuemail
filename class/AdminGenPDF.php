@@ -49,8 +49,7 @@ class AdminGenPDF
             include_once(genpdf_getPath().'/views/old_subscritions.php');
         }      
     }  
-    public function test_page(){
-        global $wpdb;
+    public function test_page(){       
         if(!empty($_REQUEST['order_id']) && is_numeric($_REQUEST['order_id']) ){
             $order = new OrderGenPDF(intval($_REQUEST['order_id']));
             ob_clean();           
@@ -61,15 +60,11 @@ class AdminGenPDF
             $dompdf = new Dompdf($options_dompdf);
 
             $dompdf->loadHtml($order->getPDF());
-
-            // (Optional) Setup the paper size and orientation
             $dompdf->setPaper('A4', 'portrait');
-
-            // Render the HTML as PDF
             $dompdf->render();
-
-            // Output the generated PDF to Browser
-            $dompdf->stream();
+            $dompdf->render();
+            $dompdf->stream();           
+           
         }        
         
     }  
