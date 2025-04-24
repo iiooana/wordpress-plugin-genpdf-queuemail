@@ -66,7 +66,6 @@ class OrderGenPDF
                 $html = str_replace("[$key]", $value, $html);
             }
         }
-
         return $html;
     }
 
@@ -144,8 +143,8 @@ class OrderGenPDF
                 foreach($mesi as $nome_mese => $price ){
                     if( is_float($price) || is_numeric($price) ){
                         $totale+=floatval($price);
-                        $order_data['td_mesi_nome'].= '<td style="width: 16%;" class="destra">'.strtoupper($nome_mese).'</td>';
-                        $order_data['td_mesi_importi'].= '<td style="width: 16%;" class="destra">€ '.number_format($price,2,",").'</td>';
+                        $order_data['td_mesi_nome'].= '<td class="destra">'.strtoupper($nome_mese).'</td>';
+                        $order_data['td_mesi_importi'].= '<td class="destra">€ '.number_format($price,2,",").'</td>';
                     }
                 }
             }
@@ -184,8 +183,9 @@ class OrderGenPDF
         if( !empty($checkbox_gruppo_cell) && !empty($checkbox_gruppo_cell[0]) && !empty($checkbox_gruppo_cell[0]['meta_value']) ){
             $order_data['checked_gruppo_cell_si'] = 'checked';
         }else{
-            $order_data['checked_gruppo_cell_no '] = 'checked';
+            $order_data['checked_gruppo_cell_no'] = 'checked';
         }
+        
         //endregion
         
         return $order_data;
