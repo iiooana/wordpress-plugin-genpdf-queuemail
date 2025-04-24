@@ -182,9 +182,9 @@ class OrderGenPDF
 
         $checkbox_gruppo_cell = $this->getOrderMetaData(['billing_gruppo_cell']);
         if( !empty($checkbox_gruppo_cell) && !empty($checkbox_gruppo_cell[0]) && !empty($checkbox_gruppo_cell[0]['meta_value']) ){
-            $order_data['cheched_gruppo_cell_si'] = 'checked';
+            $order_data['checked_gruppo_cell_si'] = 'checked';
         }else{
-            $order_data['cheched_gruppo_cell_no '] = 'checked';
+            $order_data['checked_gruppo_cell_no '] = 'checked';
         }
         //endregion
         
