@@ -1,0 +1,12 @@
+.genpdf_btn_download{
+    background-color: #67AE6E !important;
+    color: #FFFFFF !important;
+    font-weight: bold !important;
+    padding: 2px 4px !important;
+    width: unset !important;
+    max-width: 100px !important; 
+    border: none !important;
+}
+.genpdf_btn_download::after{
+    content: "Download PDF";
+}

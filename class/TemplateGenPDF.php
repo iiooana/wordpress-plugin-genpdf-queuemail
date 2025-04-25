@@ -41,18 +41,6 @@ class TemplateGenPDF
     }
 
     /**
-     * @param $product_it the id of the post where post_type='prodict'
-     * @return template_id of the product_id
-     */
-    public static function getIdTemplateByProduct( int $product_id){
-        global $wpdb;
-        $table = $wpdb->base_prefix."genpdf_products_template";
-        $query = $wpdb->prepare("SELECT template_id FROM {$table} where product_id = %d limit 1",[$product_id]);
-        $value = $wpdb->get_col($query,0);
-        return isset($value[0]) && is_numeric($value[0]) ? intval($value[0]) : null;
-    }
-
-    /**
      * @return table name of the model
      */
     private function getTableName()

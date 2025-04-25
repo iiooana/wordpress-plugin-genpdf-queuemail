@@ -10,7 +10,10 @@
  * Requires at least: 6.0 
  */
 
-use GenPDF\TemplateGenPDF\TemplateGenPDF;
+use GenPDF\GenPDF;
+use GenPDF\OrderGenPDF;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 require_once plugin_dir_path(__FILE__) . 'activate.php';
@@ -33,23 +36,26 @@ function genpdf_getPath()
 }
 
 register_activation_hook(__FILE__, 'genpdf_active');
+wp_enqueue_style('genpdf_css', plugin_dir_url(__FILE__) . "css/general.css", array(), '1.2');
 
 /**
  * Load the language, register new post type
  */
 add_action('plugins_loaded', function () {
+    //todo check
     load_plugin_textdomain('genpdf-woocommerce', false, dirname(plugin_basename(__FILE__)) . '/languages');
     new \GenPDF\AdminGenPDF();
 });
 
-add_action('woocommerce_checkout_update_order_meta', 'add_extra_order_meta', 10, 1);
+add_action('woocommerce_checkout_update_order_meta', 'genpdf_add_extra_order_meta', 10, 1);
 /**
  * @param $order_id
  * Save on DB meta data that are needed to PDF generation.
  */
-function add_extra_order_meta($order_id)
+function genpdf_add_extra_order_meta($order_id)
 {
     global $wpdb;
+    $genpdf = new GenPDF();
     //get the order
     $order = wc_get_order($order_id);
     //get the products of the order
@@ -61,7 +67,8 @@ function add_extra_order_meta($order_id)
             $product = $item->get_product(); //this is a product variantion
             if (!empty($product) && !empty($product->get_parent_id())) {
                 $array_product_metadata = [];
-                $array_product_metadata['product_id'] = $product->get_id();               
+                $array_product_metadata['product_id'] = $product->get_id();
+                $array_product_metadata['importo_totale'] = floatval($item->get_total())+floatval($item->get_total_tax());
 
                 //region giorno_generico_settimana
                 if (!empty($product->attributes['pa_data'])) {
@@ -78,7 +85,7 @@ function add_extra_order_meta($order_id)
                 if (!empty($id_product)) {
                     $array_product_metadata['parent_product_id'] = $id_product;
                     //region set the template
-                    $template_id = TemplateGenPDF::getIdTemplateByProduct($id_product);
+                    $template_id = $genpdf->getOption('template');
                     if (!empty($template_id)) {
                         $wpdb->insert(
                             $wpdb->base_prefix . "genpdf_orders_template",
@@ -99,31 +106,31 @@ function add_extra_order_meta($order_id)
                     $array_product_metadata['luogo_del_corso'] = get_field('luogoluoghi_corso', $id_product);
                     $array_product_metadata['anno_accademico'] = get_field('anno_accademico', $id_product);
                     $array_product_metadata['titolo_corso_pdf'] = get_field('titolo_corso_pdf', $id_product);
-                        //region importi mensili
-                        $tabella_importi_prodotto = get_field('tabella_importo_mese', $id_product);
-                        if (!empty($tabella_importi_prodotto)) {
-                            foreach ($tabella_importi_prodotto as $key => $value) {
-                                if (!empty($value) && floatval($value) > 0) {
-                                    match ($key) {
-                                        "importo_gennaio" => $array_product_metadata['importo_mese']['gennaio'] = $value,
-                                        "importo_febbrario" => $array_product_metadata['importo_mese']['febbraio'] = $value,
-                                        "importo_marzo" => $array_product_metadata['importo_mese']['marzo'] = $value,
-                                        "importo_aprile" => $array_product_metadata['importo_mese']['aprile'] = $value,
-                                        "importo_maggio" => $array_product_metadata['importo_mese']['maggio'] = $value,
-                                        "importo_giugno" => $array_product_metadata['importo_mese']['giugno'] = $value,
-                                        "importo_luglio" => $array_product_metadata['importo_mese']['luglio'] = $value,
-                                        "importo_agosto" => $array_product_metadata['importo_mese']['agosto'] = $value,
-                                        "importo_settembre" => $array_product_metadata['importo_mese']['settembre'] = $value,
-                                        "importo_ottobre" => $array_product_metadata['importo_mese']['ottobre'] = $value,
-                                        "importo_novembre" => $array_product_metadata['importo_mese']['novembre'] = $value,
-                                        "importo_dicembre" => $array_product_metadata['importo_mese']['dicembre'] = $value
-                                    };
-                                }
-                            }                        
-                        }                    
-                        //endregion
+                    //region importi mensili
+                    $tabella_importi_prodotto = get_field('tabella_importo_mese', $id_product);
+                    if (!empty($tabella_importi_prodotto)) {
+                        foreach ($tabella_importi_prodotto as $key => $value) {
+                            if (!empty($value) && floatval($value) > 0) {
+                                match ($key) {
+                                    "importo_gennaio" => $array_product_metadata['importo_mese']['gennaio'] = $value,
+                                    "importo_febbrario" => $array_product_metadata['importo_mese']['febbraio'] = $value,
+                                    "importo_marzo" => $array_product_metadata['importo_mese']['marzo'] = $value,
+                                    "importo_aprile" => $array_product_metadata['importo_mese']['aprile'] = $value,
+                                    "importo_maggio" => $array_product_metadata['importo_mese']['maggio'] = $value,
+                                    "importo_giugno" => $array_product_metadata['importo_mese']['giugno'] = $value,
+                                    "importo_luglio" => $array_product_metadata['importo_mese']['luglio'] = $value,
+                                    "importo_agosto" => $array_product_metadata['importo_mese']['agosto'] = $value,
+                                    "importo_settembre" => $array_product_metadata['importo_mese']['settembre'] = $value,
+                                    "importo_ottobre" => $array_product_metadata['importo_mese']['ottobre'] = $value,
+                                    "importo_novembre" => $array_product_metadata['importo_mese']['novembre'] = $value,
+                                    "importo_dicembre" => $array_product_metadata['importo_mese']['dicembre'] = $value
+                                };
+                            }
+                        }
+                    }
+                    //endregion
                     //endregion                
-                    
+
                     //region insert to db
                     $wpdb->insert(
                         $wpdb->base_prefix . 'wc_orders_meta',
@@ -140,4 +147,68 @@ function add_extra_order_meta($order_id)
         }
     }
     //endregion
+}
+
+add_filter('woocommerce_admin_order_actions', 'genpdf_buttons_orders', 100, 2);
+
+/**
+ * @return html of buttons for download pdf
+ */
+function genpdf_buttons_orders($actions, $order)
+{
+    if (!empty($timestamp =  $order->date_created->getTimestamp()) && $timestamp >= 1745594278) {
+        $genpdf_order = new OrderGenPDF($order->id);
+        $products = $genpdf_order->getProductsDetail();
+
+        if (!empty($products)) {
+            foreach ($products as $item) {
+                if (!empty($item['meta_value']) && json_validate($item['meta_value'])) {
+                    $product = json_decode($item['meta_value'], ARRAY_A);
+                    if (!empty($product['titolo_corso_pdf']) && !empty($product['product_id'])) {
+                        $actions[] = [
+                            'url'    => admin_url('admin.php?page=genpdf_download_pdf&order_id=' . $order->id . "&product_id=" . $product['product_id']),
+                            'name'   => 'Download PDF ' . $product['titolo_corso_pdf'],
+                            'action' => 'genpdf_btn_download'
+                        ];
+                    }
+                }
+            }
+        }
+    }
+    return $actions;
+}
+/**
+ * Add a plugin page.
+ */
+function genpdf_add_pages()
+{
+    add_plugins_page(
+        __('Download PDF', 'genpdf-woocommerce'),
+        __('Download PDF', 'genpdf-woocommerce'),
+        'manage_options',
+        'genpdf_download_pdf',
+        'genpdf_download_pdf'
+    );
+}
+add_action('admin_menu', 'genpdf_add_pages');
+function genpdf_download_pdf()
+{
+    if (is_admin() && !empty($_REQUEST['page']) && $_REQUEST['page'] == 'genpdf_download_pdf' 
+    && !empty($_REQUEST['order_id']) && is_numeric($_REQUEST['order_id'])
+    && !empty($_REQUEST['product_id']) && is_numeric($_REQUEST['product_id']) ) {
+        $product_id = $_REQUEST['product_id'];
+        $order = new OrderGenPDF(intval($_REQUEST['order_id']));
+        ob_clean();
+        // instantiate and use the dompdf class
+        $options_dompdf = new Options();
+        $options_dompdf->set('defaultFont', 'helvetica');
+        $options_dompdf->set('isRemoteEnabled', true);
+        $dompdf = new Dompdf($options_dompdf);
+
+        $dompdf->loadHtml($order->getPDF($product_id));
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $dompdf->render();
+        $dompdf->stream();
+    }
 }
