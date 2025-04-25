@@ -1,6 +1,4 @@
-<? if (!is_admin()) {
-    wp_die("Access denied.");
-} ?>
+<?  wp_die("Access denied.");?>
 <div class="wrap">
     <h1 class="wp-heading-inline"><?= __('Subscriptions received from the old website', 'genpdf-woocommerce') ?></h1>
     <? if (!empty($_GET['page']) && $_GET['page'] == 'genpdf_data' && !empty($_GET['lead_id']) && is_numeric($_GET['lead_id'])) { ?>

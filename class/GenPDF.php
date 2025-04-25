@@ -10,6 +10,9 @@ class GenPDF {
         };
     }
 
+    /**
+     * @return html logo
+     */
     public function getLogo(){
         $logo_pdf = $this->getOption('logo');
         if(!empty($logo_pdf) && strlen($logo_pdf) !== false){
@@ -18,6 +21,9 @@ class GenPDF {
         return null;
     }
 
+    /**
+     * @return the prefix of this plugin
+     */
     public static function getFullPrefix(){
         global $wpdb;
         return $wpdb->base_prefix.GenPDF::PREFIX_TABLE;

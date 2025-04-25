@@ -54,6 +54,9 @@ class OrderGenPDF
         return null;
     }
 
+    /**
+     * @return the html of the order
+     */
     public function getPDF()
     {
         $html = null;
@@ -69,6 +72,9 @@ class OrderGenPDF
         return $html;
     }
 
+    /**
+     * @return array to all data for the pdf
+     */
     private function getArrayData()
     {
         $gen_pdf = new GenPDF();
