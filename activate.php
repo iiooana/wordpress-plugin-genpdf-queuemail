@@ -6,7 +6,7 @@ function genpdf_active(){
   $prefix = GenPDF::getFullPrefix();
 
   //table TEMPLATES
-  //TODO ADD REMOVE UPDATE ACTION TO THIS TABLE
+  //TODO BLOCK NO UPDATE-NO DELETE
   $table = $prefix."_templates";
   maybe_create_table($table,"CREATE TABLE IF NOT EXISTS {$table} (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -15,8 +15,6 @@ function genpdf_active(){
     created_at DATETIME DEFAULT(CURTIME())
     PRIMARY KEY (id)
   )");
-
-  //TODO REMOVE TABLE product_template and add meta data orders to have for each product general.
 
   //table ORDERS_TEMPLATE
   $table = $prefix."_orders_template";

@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Generate PDF
  * Description: Generate a PDF compiled of the order's data. View the history data of the "Contact Form Entries" plugin. 
- * Version: 0.3.0
+ * Version: 0.3.2
  * Author: Ioana
  * Text Domain: genpdf-woocommerce
  * Domain Path: /languages
@@ -196,19 +196,27 @@ function genpdf_download_pdf()
     if (is_admin() && !empty($_REQUEST['page']) && $_REQUEST['page'] == 'genpdf_download_pdf' 
     && !empty($_REQUEST['order_id']) && is_numeric($_REQUEST['order_id'])
     && !empty($_REQUEST['product_id']) && is_numeric($_REQUEST['product_id']) ) {
-        $product_id = $_REQUEST['product_id'];
-        $order = new OrderGenPDF(intval($_REQUEST['order_id']));
         ob_clean();
-        // instantiate and use the dompdf class
+        $product_id = $_REQUEST['product_id'];
+        $order = new OrderGenPDF(intval($_REQUEST['order_id']));     
+        $filename = "#".$order->order_id."_".$product_id."_modulo.pdf";
+
         $options_dompdf = new Options();
         $options_dompdf->set('defaultFont', 'helvetica');
         $options_dompdf->set('isRemoteEnabled', true);
         $dompdf = new Dompdf($options_dompdf);
-
         $dompdf->loadHtml($order->getPDF($product_id));
-        $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        $dompdf->render();
-        $dompdf->stream();
+        $output = $dompdf->output();
+
+        $temp_file = tmpfile(); //create temp file      
+        fwrite($temp_file,$output); //add the content
+        $file_metadata = stream_get_meta_data($temp_file); 
+        rewind($temp_file); //reset the pointer to the start of the file       
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="'.$filename.'"');
+        header('Content-Lenght: '.filesize($file_metadata['uri']));
+        fpassthru($temp_file); //output of the file
+        fclose($temp_file); //close and delete
     }
 }
