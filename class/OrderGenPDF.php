@@ -106,7 +106,7 @@ class OrderGenPDF
         $order_data['data'] = $this->order['date_created_gmt'] ? date('d/m/Y', strtotime($this->order['date_created_gmt'])) : '';
         $signed_path = $this->getSignedPath();
         if (!empty($signed_path)  && boolval($signed_path)) {
-            $order_data['firma'] = '<img stlye="margin-left: 15px" src="' . $signed_path . '" width="240px">';
+            $order_data['firma'] = '<img stlye="margin-left: 15px" src="data:image/png;base64, ' . $signed_path . '" width="240px">';
         } else {
             $order_data['firma'] = '___________________';
         }
@@ -240,7 +240,10 @@ class OrderGenPDF
         $query = $wpdb->prepare("SELECT * FROM  wp_posts where ID = ( SELECT meta_value FROM `wp_postmeta` WHERE post_id=%d and meta_key=%s limit 1 ) AND post_type=%s limit 1 ", [$this->order_id, 'signpad', 'attachment']);
         $row = $wpdb->get_row($query, ARRAY_A);
         if (!empty($row) && !empty($row['guid']) && boolval($row['guid'])) {
-            return $row['guid'];
+            $path = add_filter('get_folder','genpdf_get_singature_folder').$row['guid'];
+            if( file_exists($path) ){
+                return base64_encode(file_get_contents($path));
+            }
         }
         return null;
     }

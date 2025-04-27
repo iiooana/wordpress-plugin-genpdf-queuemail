@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Generate PDF
  * Description: Generate a PDF compiled of the order's data. View the history data of the "Contact Form Entries" plugin. 
- * Version: 0.3.2
+ * Version: 0.3.4
  * Author: Ioana
  * Text Domain: genpdf-woocommerce
  * Domain Path: /languages
@@ -17,6 +17,7 @@ use Dompdf\Options;
 
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 require_once plugin_dir_path(__FILE__) . 'activate.php';
+require_once plugin_dir_path(__FILE__) . 'digital_signature.php';
 require_once plugin_dir_path(__FILE__) . 'class/GenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'class/OldSubGenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'class/AdminGenPDF.php';
@@ -34,7 +35,6 @@ function genpdf_getPath()
 {
     return  plugin_dir_path(__FILE__);
 }
-
 register_activation_hook(__FILE__, 'genpdf_active');
 wp_enqueue_style('genpdf_css', plugin_dir_url(__FILE__) . "css/general.css", array(), '1.2');
 

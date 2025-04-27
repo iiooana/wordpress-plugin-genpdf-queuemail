@@ -28,6 +28,20 @@ function genpdf_active(){
     FOREIGN KEY (template_id) REFERENCES {$prefix}_templates (id)
   )");
 
+  //region options
   add_option('_genpdf_logo_pdf','/wp-content/uploads/2025/04/img_pdf.png');
   add_option('_genpdf_id_current_template_pdf',1);
+  //endregion
+
+
+  //region create folder for signature
+  $dir_path = get_home_path()."wp-content/signatures";
+  if(is_dir($dir_path) === false){
+    if( mkdir($dir_path) === false) {
+        error_log("The plugin wordpress-plugin-genpdf cannot create the folder wp-content/signatures. [genpdf001]");
+    }
+    
+  } 
+  //endregion
+
 }

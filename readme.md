@@ -25,3 +25,14 @@ it_IT.po
     </li>
     <li>Add load_plugin_textdomain() on plugins_loaded</li>
 </ol>
+
+## 1.2 Folder wp-content/signatures
+
+To protect the access of the customer's signature, I changed the folder where the file will be updated.
+In function function DSCFW_save_image( $base64_img, $title ) I add:
+<code>
+$genpdf_folder = add_filter('folder','genpdf_get_singature_folder');
+if( !empty($genpdf_folder)){
+	$upload_dir  = $genpdf_folder;
+}
+</code>
