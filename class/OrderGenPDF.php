@@ -104,7 +104,7 @@ class OrderGenPDF
 
 
         $order_data['data'] = $this->order['date_created_gmt'] ? date('d/m/Y', strtotime($this->order['date_created_gmt'])) : '';
-        $signed_path = $this->getSignedPath();
+        $signed_path = $this->getbase64Signature();
         if (!empty($signed_path)  && boolval($signed_path)) {
             $order_data['firma'] = '<img stlye="margin-left: 15px" src="data:image/png;base64, ' . $signed_path . '" width="240px">';
         } else {
@@ -232,17 +232,19 @@ class OrderGenPDF
     }
 
     /**
-     * @return the url of the image path
+     * @return base64 of the signature
      */
-    private function getSignedPath()
+    private function getbase64Signature()
     {
         global $wpdb;
-        $query = $wpdb->prepare("SELECT * FROM  wp_posts where ID = ( SELECT meta_value FROM `wp_postmeta` WHERE post_id=%d and meta_key=%s limit 1 ) AND post_type=%s limit 1 ", [$this->order_id, 'signpad', 'attachment']);
+        $query = $wpdb->prepare("SELECT ID FROM  wp_posts where ID = ( SELECT meta_value FROM `wp_postmeta` WHERE post_id=%d and meta_key=%s limit 1 ) AND post_type=%s limit 1 ", [$this->order_id, 'signpad', 'attachment']);
         $row = $wpdb->get_row($query, ARRAY_A);
-        if (!empty($row) && !empty($row['guid']) && boolval($row['guid'])) {
-            $path = add_filter('get_folder','genpdf_get_singature_folder').$row['guid'];
-            if( file_exists($path) ){
-                return base64_encode(file_get_contents($path));
+        if (!empty($row) && !empty($row['ID']) ) {
+            $meta = get_post_meta($row['ID'],'_wp_attached_file');
+            $genpdf_folder = apply_filters('genpdf_get_signature_folder','');
+            //genpdf_vardie($genpdf_folder['basedir'].$meta[0]);
+            if( !empty($meta[0]) && file_exists($genpdf_folder['basedir'].$meta[0])){
+                return base64_encode(file_get_contents($genpdf_folder['basedir'].$meta[0]));
             }
         }
         return null;

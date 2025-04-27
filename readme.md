@@ -28,11 +28,4 @@ it_IT.po
 
 ## 1.2 Folder wp-content/signatures
 
-To protect the access of the customer's signature, I changed the folder where the file will be updated.
-In function function DSCFW_save_image( $base64_img, $title ) I add:
-<code>
-$genpdf_folder = add_filter('folder','genpdf_get_singature_folder');
-if( !empty($genpdf_folder)){
-	$upload_dir  = $genpdf_folder;
-}
-</code>
+To protect the access of the customer's signature, I create a folder wp-content/signatures where all signatures will be saved.
