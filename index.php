@@ -176,7 +176,6 @@ function genpdf_buttons_orders($actions, $order)
         $products = $genpdf_order->getProductsDetail();
         // genpdf_vardie($products);
         if (!empty($products)) {
-            echo "ok";
             foreach ($products as $item) {
                 if (!empty($item['meta_value']) && json_validate($item['meta_value'])) {
                     $product = json_decode($item['meta_value'], ARRAY_A);

@@ -263,8 +263,10 @@ class OrderGenPDF
         $tmp['body'] = [];
         //genpdf_vardie($product);
         if (!empty($product['tabella_extra']) && is_array($product['tabella_extra'])) {
+            //genpdf_vardie($product['tabella_extra']);
             foreach ($product['tabella_extra'] as $column_name => $value) {
-                if (!empty($value)) {
+               // genpdf_vardie($column_name,$value,$value[0],!empty($value[0]));
+                if (!empty($value[0])) {
                     switch ($column_name) {
                         case "has_column_where":
                             $tmp['header'][] = '<th style="color: #fff;text-align: center;font-size:14pt;">DOVE</th>';
@@ -294,6 +296,7 @@ class OrderGenPDF
                 }
             }
         }
+      
         if(empty($tmp['header']) || empty($tmp['body'])){
             return '';
         }
