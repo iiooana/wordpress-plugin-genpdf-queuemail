@@ -294,7 +294,9 @@ class OrderGenPDF
                 }
             }
         }
-
+        if(empty($tmp['header']) || empty($tmp['body'])){
+            return '';
+        }
         return '<table style="margin-top:5px">
                 <thead>
                     <tr style="background-color: #1e87ac;font-size:14pt;">
