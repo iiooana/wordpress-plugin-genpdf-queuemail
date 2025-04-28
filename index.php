@@ -117,6 +117,8 @@ function genpdf_add_extra_order_meta($order_id)
                     $array_product_metadata['luogo_del_corso'] = get_field('luogoluoghi_corso', $id_product);
                     $array_product_metadata['anno_accademico'] = get_field('anno_accademico', $id_product);
                     $array_product_metadata['titolo_corso_pdf'] = get_field('titolo_corso_pdf', $id_product);
+                    $array_product_metadata['tabella_extra'] = get_field('tabella_extra', $id_product);
+                    
                     //region importi mensili
                     $tabella_importi_prodotto = get_field('tabella_importo_mese', $id_product);
                     if (!empty($tabella_importi_prodotto)) {
@@ -168,12 +170,13 @@ add_filter('woocommerce_admin_order_actions', 'genpdf_buttons_orders', 100, 2);
 function genpdf_buttons_orders($actions, $order)
 {
     $timestamp =  $order->date_created->getTimestamp();
-    //echo "order ".$order->id." -time".$timestamp;
+    echo "order ".$order->id." -time ".$timestamp;
     if (!empty($timestamp) && $timestamp >= 1745758835) {
         $genpdf_order = new OrderGenPDF($order->id);
         $products = $genpdf_order->getProductsDetail();
         // genpdf_vardie($products);
         if (!empty($products)) {
+            echo "ok";
             foreach ($products as $item) {
                 if (!empty($item['meta_value']) && json_validate($item['meta_value'])) {
                     $product = json_decode($item['meta_value'], ARRAY_A);

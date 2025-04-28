@@ -151,6 +151,10 @@ class OrderGenPDF
                 if (!empty($item['meta_value']) && json_validate($item['meta_value'])) {
                     $product = json_decode($item['meta_value'], ARRAY_A);
                     if (intval($product['product_id']) == $product_id) {
+                        //region tabella extra
+                        $order_data['tabella_extra'] = self::getHTMLTabellaExtra($product);
+                        //genpdf_vardie($order_data);
+                        //endregion
                         //genpdf_vardie($product);
                         $order_data['titolo_corso_pdf'] = $product['titolo_corso_pdf'];
                         $order_data['giorno_generico_settimana'] = $product['giorno_generico_settimana'];
@@ -252,6 +256,59 @@ class OrderGenPDF
         }
         return null;
     }
+    //tabella_dove_quando_crediti
+    private function getHTMLTabellaExtra($product)
+    {
+        $tmp['header'] = [];
+        $tmp['body'] = [];
+        //genpdf_vardie($product);
+        if (!empty($product['tabella_extra']) && is_array($product['tabella_extra'])) {
+            foreach ($product['tabella_extra'] as $column_name => $value) {
+                if (!empty($value)) {
+                    switch ($column_name) {
+                        case "has_column_where":
+                            $tmp['header'][] = '<th style="color: #fff;text-align: center;font-size:14pt;">DOVE</th>';
+                            $tmp['body'][] = '<td class="destra">
+                                <div style="display: flex; vertical-align:middle;">
+                                    <input type="checkbox" checked>[luogo_del_corso]
+                                </div>
+                            </td>';
+                            break;
+                        case "has_column_when":
+                            $tmp['header'][] = '<th style="color: #fff;text-align: center;font-size:14pt;">QUANDO</th>';
+                            $tmp['body'][] = '<td class="destra">
+                                <div style="display: flex; vertical-align:middle;">
+                                    <input type="checkbox" checked>[giorno_generico_settimana]
+                                </div>
+                            </td>';
+                            break;
+                        case "has_column_ecm":
+                            $tmp['header'][] = '<th style="color: #fff;text-align: center;font-size:14pt;">CREDITI</th>';
+                            $tmp['body'][] = '<td class="destra">
+                                <div style="display: flex; vertical-align:middle;">
+                                   <input type="checkbox" [checked_crediti]>CREDITI ECM
+                                </div>
+                            </td>';
+                            break;
+                    }
+                }
+            }
+        }
+
+        return '<table style="margin-top:5px">
+                <thead>
+                    <tr style="background-color: #1e87ac;font-size:14pt;">
+                        '.implode("",$tmp['header']).'
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        '.implode("",$tmp['body']).'
+                    </tr>
+                </tbody>
+            </table>';
+
+    }
 
     /**
      * @return table name of the model
@@ -352,10 +409,11 @@ class OrderGenPDF
         }
     }
 
-    public function getCustomerInfo(){
+    public function getCustomerInfo()
+    {
         global $wpdb;
-        $table = $wpdb->base_prefix."wc_order_addresses";
-        $query = $wpdb->prepare("SELECT * from {$table} where order_id =  %d limit 1",[$this->order_id]);
-        return $wpdb->get_row($query,ARRAY_A);
+        $table = $wpdb->base_prefix . "wc_order_addresses";
+        $query = $wpdb->prepare("SELECT * from {$table} where order_id =  %d limit 1", [$this->order_id]);
+        return $wpdb->get_row($query, ARRAY_A);
     }
 }

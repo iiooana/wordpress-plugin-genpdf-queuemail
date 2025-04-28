@@ -32,10 +32,11 @@ add_action('genpdf_cron', function () {
 	if (!empty($orders) && is_array($orders) && count($orders) > 0) {
 
 		foreach ($orders as $order_email) {
+			//todo lock access row db
 			genpdf_vardie($order_email);
 			$genpdf_order = new OrderGenPDF($order_email['order_id']);
 			$customer_info = $genpdf_order->getCustomerInfo();
-			$customer_info['email'] = 'ioana2502@yahoo.it';
+			$customer_info['email'] = 'ioana2502@yahoo.it';//todo remove and update the option on db
 			genpdf_vardie($customer_info);
 			//genpdf_vardie($genpdf_order->order,$genpdf_order->isBonifico());
 			$attachments = $genpdf_order->getAttachmentsPDF($array_settings['temp_dir']);
