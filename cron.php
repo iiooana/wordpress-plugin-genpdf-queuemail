@@ -43,6 +43,8 @@ add_action('genpdf_cron', function () {
 				$cc = 'ioanaudia7@gmail.com';//todo remove and add option plugin
 				$subject = 'Ordine #' . $order_email['order_id'];
 
+				//TODO CHECK ORDER STATUS
+
 				$genpdf_order = new OrderGenPDF($order_email['order_id']);
 				$products = $genpdf_order->getProductsDetail();
 				//region generate pdf files
