@@ -15,10 +15,9 @@ add_filter('cron_schedules', function ($schedules) {
 });
 
 add_action('init', function() {
-    // Log per verificare se il cron è stato registrato
     if (!wp_next_scheduled('genpdf_cron')) {
         wp_schedule_event(time(), 'every_minute', 'genpdf_cron');
-        error_log('genpdf_cron scheduled.');
+        error_log('genpdf_cron scheduled.'); //todo remove
     }
 });
 
@@ -38,8 +37,9 @@ add_action('genpdf_cron', function () {
 			$result = $wpdb->get_row($wpdb->prepare("select billing_email from {$table} where id =  %d limit 1", [$order_email['order_id']]), ARRAY_A);
 			if (!empty($result['billing_email'])) {
 				$email_to =  $result['billing_email'];
-				$email_to =  'ioana2502@yahoo.it';
-				$cc = 'ioanaudia7@gmail.com';
+				$email_to =  'ioana2502@yahoo.it';//todo remove
+				$cc = 'ioanaudia7@gmail.com';//todo remove
+				//todo add admin...
 				$subject = 'Ordine #' . $order_email['order_id'];
 
 				$genpdf_order = new OrderGenPDF($order_email['order_id']);
