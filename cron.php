@@ -22,7 +22,6 @@ add_action('init', function() {
     }
 });
 
-// 3. Hook your genpdf_cron to run
 add_action('genpdf_cron', function () {
 	global $wpdb;
 	//region genpdf cron
