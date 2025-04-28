@@ -25,7 +25,7 @@ class OrderGenPDF
             where id =  %d limit 1", [$order_id]);
         $row =  $wpdb->get_row($query, ARRAY_A);
         if (empty($row) || empty($row['id'])) {
-            $message = var_export(["message" => "The order_id does not exists.", "order_id" => $order_id], true);
+            $message = var_export(["message" => "[ERROR-GENPDF002]The order_id does not exists.", "order_id" => $order_id], true);
             error_log($message);
             throw new \Exception($message, 1003);
         }
@@ -36,7 +36,7 @@ class OrderGenPDF
         $query = $wpdb->prepare("SELECT * FROM {$table} where order_id=%d limit 1", [$order_id]);
         $row = $wpdb->get_row($query, ARRAY_A);
         if (empty($row) || empty($row['order_id'])) {
-            $message = var_export(["message" => "Template of order_id not found.", "order_id" => $order_id], true);
+            $message = var_export(["message" => "[ERROR-GENPDF003]Template of order_id not found.", "order_id" => $order_id], true);
             error_log($message);
             //throw new \Exception($message, 1002);
         }else{
@@ -296,4 +296,6 @@ class OrderGenPDF
         $query = $wpdb->prepare("select meta_value from {$table} where order_id =  %d and meta_key =  %s ", [$this->order_id, 'product_detail']);
         return $wpdb->get_results($query, ARRAY_A);
     }
+
+    
 }

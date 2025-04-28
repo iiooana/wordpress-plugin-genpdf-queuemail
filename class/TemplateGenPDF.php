@@ -20,7 +20,7 @@ class TemplateGenPDF
         $query = $wpdb->prepare("SELECT * FROM {$table} where id=%d limit 1", [$id]);
         $row = $wpdb->get_row($query, ARRAY_A);
         if (empty($row) || empty($row['id'])) {
-            $message = var_export(["message" => "Template not found", "id" => $id], true);
+            $message = var_export(["message" => "[ERROR-GENPDF001]Template not found", "id" => $id], true);
             error_log($message);
             //throw new \Exception($message, 1001);
         }else{

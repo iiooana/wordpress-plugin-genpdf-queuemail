@@ -26,6 +26,7 @@ require_once plugin_dir_path(__FILE__) . 'class/AdminGenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'class/TemplateGenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'class/OrderGenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
+require_once plugin_dir_path(__FILE__) . 'cron.php';
 
 function genpdf_vardie()
 {
@@ -73,7 +74,7 @@ function genpdf_add_extra_order_meta($order_id)
             if (!empty($product) && !empty($product->get_parent_id())) {
                 $array_product_metadata = [];
                 $array_product_metadata['product_id'] = $product->get_id();
-                $array_product_metadata['importo_totale'] = floatval($item->get_total())+floatval($item->get_total_tax());
+                $array_product_metadata['importo_totale'] = floatval($item->get_total()) + floatval($item->get_total_tax());
 
                 //region giorno_generico_settimana
                 if (!empty($product->attributes['pa_data'])) {
@@ -166,7 +167,7 @@ function genpdf_buttons_orders($actions, $order)
     if (!empty($timestamp) && $timestamp >= 1745758835) {
         $genpdf_order = new OrderGenPDF($order->id);
         $products = $genpdf_order->getProductsDetail();
-       // genpdf_vardie($products);
+        // genpdf_vardie($products);
         if (!empty($products)) {
             foreach ($products as $item) {
                 if (!empty($item['meta_value']) && json_validate($item['meta_value'])) {
@@ -201,13 +202,15 @@ function genpdf_add_pages()
 add_action('admin_menu', 'genpdf_add_pages');
 function genpdf_download_pdf()
 {
-    if (is_admin() && !empty($_REQUEST['page']) && $_REQUEST['page'] == 'genpdf_download_pdf' 
-    && !empty($_REQUEST['order_id']) && is_numeric($_REQUEST['order_id'])
-    && !empty($_REQUEST['product_id']) && is_numeric($_REQUEST['product_id']) ) {
+    if (
+        is_admin() && !empty($_REQUEST['page']) && $_REQUEST['page'] == 'genpdf_download_pdf'
+        && !empty($_REQUEST['order_id']) && is_numeric($_REQUEST['order_id'])
+        && !empty($_REQUEST['product_id']) && is_numeric($_REQUEST['product_id'])
+    ) {
         ob_clean();
         $product_id = $_REQUEST['product_id'];
-        $order = new OrderGenPDF(intval($_REQUEST['order_id']));     
-        $filename = "#".$order->order_id."_".$product_id."_modulo.pdf";
+        $order = new OrderGenPDF(intval($_REQUEST['order_id']));
+        $filename = "#" . $order->order_id . "_" . $product_id . "_modulo.pdf";
 
         $options_dompdf = new Options();
         $options_dompdf->set('defaultFont', 'helvetica');
@@ -218,12 +221,12 @@ function genpdf_download_pdf()
         $output = $dompdf->output();
 
         $temp_file = tmpfile(); //create temp file      
-        fwrite($temp_file,$output); //add the content
-        $file_metadata = stream_get_meta_data($temp_file); 
+        fwrite($temp_file, $output); //add the content
+        $file_metadata = stream_get_meta_data($temp_file);
         rewind($temp_file); //reset the pointer to the start of the file       
         header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="'.$filename.'"');
-        header('Content-Lenght: '.filesize($file_metadata['uri']));
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Lenght: ' . filesize($file_metadata['uri']));
         fpassthru($temp_file); //output of the file
         fclose($temp_file); //close and delete
     }
