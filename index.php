@@ -203,8 +203,20 @@ function genpdf_add_pages()
         'genpdf_download_pdf',
         'genpdf_download_pdf'
     );
+    add_plugins_page(
+        __('TEST', 'genpdf-woocommerce'),
+        __('TEST', 'genpdf-woocommerce'),
+        'manage_options',
+        'genpdf_test',
+        'genpdf_test'
+    );
 }
 add_action('admin_menu', 'genpdf_add_pages');
+function genpdf_test(){
+    //genpdf_vardie("ok");
+    do_action('genpdf_cron');
+}
+
 function genpdf_download_pdf()
 {
     if (

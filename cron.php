@@ -14,7 +14,7 @@ add_filter('cron_schedules', function ($schedules) {
 	return $schedules;
 });
 
-add_action('init', function() {
+add_action('wp_loaded', function() {
     if (!wp_next_scheduled('genpdf_cron')) {
         wp_schedule_event(time(), 'every_minute', 'genpdf_cron');
         error_log('genpdf_cron scheduled.'); //todo remove
@@ -22,6 +22,7 @@ add_action('init', function() {
 });
 
 add_action('genpdf_cron', function () {
+	error_log("genpdf_cron START");
 	global $wpdb;
 	//region genpdf cron
 	$orders = OrderEmailGenPDF::getOrdersToSendEmails();
@@ -36,10 +37,10 @@ add_action('genpdf_cron', function () {
 		foreach ($orders as $order_email) {
 			$result = $wpdb->get_row($wpdb->prepare("select billing_email from {$table} where id =  %d limit 1", [$order_email['order_id']]), ARRAY_A);
 			if (!empty($result['billing_email'])) {
+				genpdf_vardie($result);
 				$email_to =  $result['billing_email'];
 				$email_to =  'ioana2502@yahoo.it';//todo remove
-				$cc = 'ioanaudia7@gmail.com';//todo remove
-				//todo add admin...
+				$cc = 'ioanaudia7@gmail.com';//todo remove and add option plugin
 				$subject = 'Ordine #' . $order_email['order_id'];
 
 				$genpdf_order = new OrderGenPDF($order_email['order_id']);
@@ -76,7 +77,7 @@ add_action('genpdf_cron', function () {
 						} else {
 							OrderEmailGenPDF::UpdateOrderEmail($order_email['order_id'], [
 								"status" => "error",
-								"message" => "The is a problem with wp_emai."
+								"message" => "The is a problem with wp_mail."
 							]);
 						}
 					} else {
@@ -101,4 +102,5 @@ add_action('genpdf_cron', function () {
 		}
 	}
 	//endregion
+	error_log("genpdf_cron END");
 });
