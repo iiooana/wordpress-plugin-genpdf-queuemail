@@ -117,4 +117,7 @@ class OrderEmailGenPDF
             error_log($message);
         }
     }
+    public static function getListAcceptsStatus(){
+        return ['wc-processing','processing','wc-completed','completed'];
+    }
 }

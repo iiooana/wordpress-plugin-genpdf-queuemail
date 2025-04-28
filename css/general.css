@@ -10,3 +10,15 @@
 .genpdf_btn_download::after{
     content: "Download PDF";
 }
+.genpdf_btn_send_attachments{
+    background-color: #00879E !important;
+    color: #FFFFFF !important;
+    font-weight: bold !important;
+    padding: 2px 4px !important;
+    width: unset !important;
+    max-width: 100px !important; 
+    border: none !important;
+}
+.genpdf_btn_send_attachments::after{
+    content: "Invia allegati";
+}

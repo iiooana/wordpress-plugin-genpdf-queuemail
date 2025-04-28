@@ -41,6 +41,7 @@ class GenPDF {
         $array_settings['temp_dir'] = sys_get_temp_dir();
         $array_settings['templates']['customer'] = file_get_contents(genpdf_getPath()."/templates/customer.html");
         $array_settings['templates']['admin'] = file_get_contents(genpdf_getPath()."/templates/admin.html");
+        $array_settings['ok_status_order'] = OrderEmailGenPDF::getListAcceptsStatus();
         return $array_settings;
     }
 

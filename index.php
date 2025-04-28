@@ -40,10 +40,11 @@ function genpdf_getPath()
 }
 register_activation_hook(__FILE__, 'genpdf_active');
 
-function genpdf_assets() {
-	wp_enqueue_style('genpdf_css', plugin_dir_url(__FILE__) . "css/general.css", array(), '1.2');
+function genpdf_assets()
+{
+    wp_enqueue_style('genpdf_css', plugin_dir_url(__FILE__) . "css/general.css", array(), '1.2');
 }
-add_action( 'admin_init', 'genpdf_assets' );
+add_action('admin_init', 'genpdf_assets');
 
 
 /**
@@ -118,7 +119,7 @@ function genpdf_add_extra_order_meta($order_id)
                     $array_product_metadata['anno_accademico'] = get_field('anno_accademico', $id_product);
                     $array_product_metadata['titolo_corso_pdf'] = get_field('titolo_corso_pdf', $id_product);
                     $array_product_metadata['tabella_extra'] = get_field('tabella_extra', $id_product);
-                    
+
                     //region importi mensili
                     $tabella_importi_prodotto = get_field('tabella_importo_mese', $id_product);
                     if (!empty($tabella_importi_prodotto)) {
@@ -170,6 +171,7 @@ add_filter('woocommerce_admin_order_actions', 'genpdf_buttons_orders', 100, 2);
 function genpdf_buttons_orders($actions, $order)
 {
     $timestamp =  $order->date_created->getTimestamp();
+    $array_status = OrderEmailGenPDF::getListAcceptsStatus();
     //echo "order ".$order->id." -time ".$timestamp;
     if (!empty($timestamp) && $timestamp > 1745843280) {
         $genpdf_order = new OrderGenPDF($order->id);
@@ -189,6 +191,16 @@ function genpdf_buttons_orders($actions, $order)
                     }
                 }
             }
+            //region button to sentemail customer
+            if (!empty($order->status) && in_array($order->status, $array_status)) {
+                $actions[] = [
+                    "url" => admin_url('admin.php?page=genpdf_send_attachments&order_id=' . $order->id),
+                    "name" => "Invia allegati per email",
+                    "action" => "genpdf_btn_send_attachments"
+                ];
+            }
+
+            //endregion
         }
     }
     return $actions;
@@ -198,6 +210,7 @@ function genpdf_buttons_orders($actions, $order)
  */
 function genpdf_add_pages()
 {
+    //region page to download pdf
     add_plugins_page(
         __('Download PDF', 'genpdf-woocommerce'),
         __('Download PDF', 'genpdf-woocommerce'),
@@ -205,6 +218,18 @@ function genpdf_add_pages()
         'genpdf_download_pdf',
         'genpdf_download_pdf'
     );
+    //endregion
+
+    //region to add sendemail
+    add_plugins_page(
+        __('Send attachments', 'genpdf-woocommerce'),
+        __('Send attachments', 'genpdf-woocommerce'),
+        'manage_options',
+        'genpdf_send_attachments',
+        'genpdf_send_attachments',
+    );
+    //endregion
+    //todo remove
     add_plugins_page(
         __('TEST', 'genpdf-woocommerce'),
         __('TEST', 'genpdf-woocommerce'),
@@ -214,8 +239,9 @@ function genpdf_add_pages()
     );
 }
 add_action('admin_menu', 'genpdf_add_pages');
-function genpdf_test_cron(){
-    //genpdf_vardie("ok");
+function genpdf_test_cron()
+{
+    //todo remove this function
     do_action('genpdf_cron');
 }
 
@@ -248,5 +274,46 @@ function genpdf_download_pdf()
         header('Content-Lenght: ' . filesize($file_metadata['uri']));
         fpassthru($temp_file); //output of the file
         fclose($temp_file); //close and delete
+    }
+}
+function genpdf_send_attachments()
+{
+    if (
+        is_admin() && !empty($_REQUEST['page']) && $_REQUEST['page'] == 'genpdf_send_attachments'
+        && !empty($_REQUEST['order_id']) && is_numeric($_REQUEST['order_id'])
+    ) {
+        global $wpdb;
+        $table = OrderEmailGenPDF::getTableName();
+        $query = $wpdb->prepare("SELECT * FROM {$table} where order_id= %d", [$_REQUEST['order_id']]);
+        $row = $wpdb->get_row($query, ARRAY_A);
+        $info = json_decode($row['info'], true);
+        $date_time = date('Y-m-d H:i:s', current_time('timestamp'));
+        $info[$date_time] = ['message'=> "Aggiunto alla coda dal id_utente_wp = ".get_current_user_id()];
+        $is_updated = $wpdb->update(
+            $table,
+            array(
+                'remaining_attemps' => 1,
+                'info' => json_encode($info),
+                'next_time' => date('Y-m-d H:i:s', intval(current_time('timestamp')) + 120 ),
+                'updated_at' => $date_time,
+            ),
+            array(
+                'order_id' => $row['order_id'],
+            ),
+            array(
+                '%d',
+                '%s',
+                '%s',
+                '%s',
+            ),
+            array(
+                '%d',
+            )
+        );
+        if($is_updated === false){
+            echo "<h1>Si è verificato un'errore, contattare l'assistenza</h1>";
+        }else{
+            echo "<h1>A breve verrà inviata la mail, puoi chiudere la pagina.</h1>";
+        }
     }
 }

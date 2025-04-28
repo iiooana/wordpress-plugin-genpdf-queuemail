@@ -26,18 +26,17 @@ add_action('genpdf_cron', function () {
 	global $wpdb;
 	$genpdf = new GenPDF();
 	$array_settings = $genpdf->getArraySettings();
-    genpdf_vardie("wait");
+	genpdf_vardie("wait");
 	//region genpdf cron    
 	$orders = OrderEmailGenPDF::getOrdersToSendEmails();
 	//genpdf_vardie($orders);
 	if (!empty($orders) && is_array($orders) && count($orders) > 0) {
-
 		foreach ($orders as $order_email) {
 			//todo lock access row db
 			//genpdf_vardie($order_email);
 			$genpdf_order = new OrderGenPDF($order_email['order_id']);
 			$customer_info = $genpdf_order->getCustomerInfo();
-			$customer_info['email'] = 'ioana2502@yahoo.it';//todo remove and update the option on db
+			$customer_info['email'] = 'ioana2502@yahoo.it'; //todo remove and update the option on db
 			$customer_info['email'] = 'mattiacalore@2mcreations.it';
 			//genpdf_vardie($customer_info);
 			//genpdf_vardie($genpdf_order->order,$genpdf_order->isBonifico());
@@ -49,15 +48,38 @@ add_action('genpdf_cron', function () {
 				]);
 				break;
 			}
-			var_dump("bonifico",$genpdf_order->isBonifico());
-			if ($genpdf_order->isBonifico() && 0) {
-			   // genpdf_vardie("bonifico");
-				//genpdf_vardie($order_email);
-			//	genpdf_vardie($array_settings);
+			genpdf_vardie("bonifico", $genpdf_order->order['status']);
+			//region check if the payment is ok or not
+			if (!empty($genpdf_order->order['status']) && in_array($genpdf_order->order['status'], $array_settings['ok_status_order'])) {
+				//genpdf_vardie("pagamento. online");
+				if (!empty($customer_info['email']) && filter_var($customer_info['email'], FILTER_VALIDATE_EMAIL)) {
+					$message =  $array_settings['templates']['customer'];
+					$message = str_replace('[numero_ordine]', $genpdf_order->order_id, $message);
+					$message = str_replace('[nome_cliente]', $customer_info['first_name'], $message);
+					$message = str_replace('[blogname]', $genpdf->getOption('blogname'), $message);
+					$headers = array('Content-Type: text/html; charset=UTF-8');
+					if (wp_mail($customer_info['email'], "Ordine #" . $genpdf_order->order_id . " - Bonifico", $message, $headers, $attachments)) {
+						OrderEmailGenPDF::UpdateOrderEmail($order_email['order_id'], [
+							"status" => "success_email_customer",
+							"email_to" => $customer_info['email'],
+						], true);
+					} else {
+						OrderEmailGenPDF::UpdateOrderEmail($order_email['order_id'], [
+							"status" => "error",
+							"message" => "I can't send email to customer " . $customer_info['email'] . "."
+						]);
+					}
+				} else {
+					OrderEmailGenPDF::UpdateOrderEmail($order_email['order_id'], [
+						"status" => "error",
+						"message" => "The email " . $customer_info['email'] . " is not valid " . $array_settings['cc'] . "."
+					]);
+				}
+			} else if ($genpdf_order->isBonifico()) {
 				if (empty($order_email['has_sent_email_admin'])) {
 					//email only to admin
 					if (!empty($array_settings['cc']) && filter_var($array_settings['cc'], FILTER_VALIDATE_EMAIL)) {
-					    //genpdf_vardie("ok filtro");
+						//genpdf_vardie("ok filtro");
 						$message =  $array_settings['templates']['admin'];
 						$message = str_replace('[numero_ordine]', $genpdf_order->order_id, $message);
 						$message = str_replace('[nome_cliente]', $customer_info['first_name'], $message);
@@ -66,7 +88,7 @@ add_action('genpdf_cron', function () {
 						//genpdf_vardie($message);
 						$headers = array('Content-Type: text/html; charset=UTF-8');
 						if (wp_mail($array_settings['cc'], "Ordine #" . $genpdf_order->order_id . " - Bonifico", $message, $headers, $attachments)) {
-						    //var_dump("ok inviato admin");
+							//var_dump("ok inviato admin");
 							OrderEmailGenPDF::UpdateOrderEmail($order_email['order_id'], [
 								"status" => "success_email_admin",
 								"email_to" => $array_settings['cc'],
@@ -75,57 +97,26 @@ add_action('genpdf_cron', function () {
 							OrderEmailGenPDF::setHasSentEmailAdmin($genpdf_order->order_id);
 							//endregion
 						} else {
-						  //  var_dump("failed");
+							//  var_dump("failed");
 							OrderEmailGenPDF::UpdateOrderEmail($order_email['order_id'], [
 								"status" => "error",
 								"message" => "I can't send email to admin " . $array_settings['cc'] . "."
 							]);
 						}
 					} else {
-					  //  genpdf_vardie("no filtro");
+						//  genpdf_vardie("no filtro");
 						OrderEmailGenPDF::UpdateOrderEmail($order_email['order_id'], [
 							"status" => "error",
 							"message" => "There is not email for option _genpdf_email_cc " . $array_settings['cc'] . "."
 						]);
 					}
-
 				}
 			} else {
-			     //genpdf_vardie("pagamento. online");
-				//region check if the payment is ok or not
-				if ($genpdf_order->order['status'] == 'wc-processing' || 1) {
-					if (!empty($customer_info['email']) && filter_var($customer_info['email'], FILTER_VALIDATE_EMAIL)) {
-						$message =  $array_settings['templates']['customer'];
-						$message = str_replace('[numero_ordine]', $genpdf_order->order_id, $message);
-						$message = str_replace('[nome_cliente]', $customer_info['first_name'], $message);
-						$message = str_replace('[blogname]', $genpdf->getOption('blogname'), $message);
-						$headers = array('Content-Type: text/html; charset=UTF-8');
-						if (wp_mail($customer_info['email'], "Ordine #" . $genpdf_order->order_id . " - Bonifico", $message, $headers, $attachments)) {
-							OrderEmailGenPDF::UpdateOrderEmail($order_email['order_id'], [
-								"status" => "success_email_customer",
-								"email_to" => $customer_info['email'],
-							], true);
-						} else {
-							OrderEmailGenPDF::UpdateOrderEmail($order_email['order_id'], [
-								"status" => "error",
-								"message" => "I can't send email to customer " . $customer_info['email'] . "."
-							]);
-						}
-					} else {
-						OrderEmailGenPDF::UpdateOrderEmail($order_email['order_id'], [
-							"status" => "error",
-							"message" => "The email " . $customer_info['email'] . " is not valid " . $array_settings['cc'] . "."
-						]);
-					}
-				} else {
-					OrderEmailGenPDF::UpdateOrderEmail($order_email['order_id'], [
-						"status" => "error",
-						"message" => "The status order is not wc-processing, is: " . $genpdf_order->order['status'] . "."
-					]);
-				}
-				//endregion
+				OrderEmailGenPDF::UpdateOrderEmail($order_email['order_id'], [
+					"status" => "error",
+					"message" => "The status order is: " . $genpdf_order->order['status'] . "."
+				]);
 			}
-
 			$genpdf_order->deleteAttachments($attachments);
 		}
 	}
