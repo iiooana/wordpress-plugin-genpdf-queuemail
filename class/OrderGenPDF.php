@@ -4,6 +4,9 @@ namespace GenPDF;
 
 use GenPDF\GenPDF;
 use GenPDF\TemplateGenPDF\TemplateGenPDF;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use GenPDF\OrderEmailGenPDF;
 
 class OrderGenPDF
 {
@@ -39,12 +42,12 @@ class OrderGenPDF
             $message = var_export(["message" => "[ERROR-GENPDF003]Template of order_id not found.", "order_id" => $order_id], true);
             error_log($message);
             //throw new \Exception($message, 1002);
-        }else{
+        } else {
             $this->order_id = $row['order_id'];
             $this->template_id =  $row['template_id'];
             $this->created_at =  $row['created_at'];
             $this->updated_at = $row['updated_at'];
-        }      
+        }
     }
     /**
      * @return array to all data for the pdf
@@ -78,7 +81,7 @@ class OrderGenPDF
         //endregion
 
         //region order meta datas
-        $order_meta_datas =  self::getOrderMetaData(['_billing_luogo_nascita', '_billing_data_nascita', '_billing_cf', '_billing_professione', '_billing_piva', '_billing_company_address', '_billing_company_address_number', '_billing_company_citty', '_billing_company_cap', '_billing_pec', '_billing_sdi','_billing_company_provincia']);
+        $order_meta_datas =  self::getOrderMetaData(['_billing_luogo_nascita', '_billing_data_nascita', '_billing_cf', '_billing_professione', '_billing_piva', '_billing_company_address', '_billing_company_address_number', '_billing_company_citty', '_billing_company_cap', '_billing_pec', '_billing_sdi', '_billing_company_provincia']);
         if (!empty($order_meta_datas)) {
             foreach ($order_meta_datas as $item) {
                 match ($item['meta_key']) {
@@ -156,9 +159,8 @@ class OrderGenPDF
 
                         //region crediti ecm
                         $crediti_richiesti = self::getOrderMetaData(['creditiecm']);
-                        if(!empty($crediti_richiesti[0]) && !empty($crediti_richiesti[0]['meta_value']) && !empty($product['crediti_ecm']) ){
+                        if (!empty($crediti_richiesti[0]) && !empty($crediti_richiesti[0]['meta_value']) && !empty($product['crediti_ecm'])) {
                             $order_data['checked_crediti'] = 'checked';
-                            
                         }
                         //endregion
 
@@ -167,7 +169,7 @@ class OrderGenPDF
                             $order_data['importo_acconto']  = number_format($product['importo_totale'], 2, ",");
                             $totale = floatval($product['importo_totale']);
                             //region months
-                            if (!empty($product['importo_mese']) ) {
+                            if (!empty($product['importo_mese'])) {
                                 $order_data['td_mesi_nome'] = '';
                                 $order_data['td_mesi_importi'] = '';
                                 foreach ($product['importo_mese'] as $nome_mese => $price) {
@@ -240,12 +242,12 @@ class OrderGenPDF
         global $wpdb;
         $query = $wpdb->prepare("SELECT ID FROM  wp_posts where ID = ( SELECT meta_value FROM `wp_postmeta` WHERE post_id=%d and meta_key=%s limit 1 ) AND post_type=%s limit 1 ", [$this->order_id, 'signpad', 'attachment']);
         $row = $wpdb->get_row($query, ARRAY_A);
-        if (!empty($row) && !empty($row['ID']) ) {
-            $meta = get_post_meta($row['ID'],'_wp_attached_file');
-            $genpdf_folder = apply_filters('genpdf_get_signature_folder','');
+        if (!empty($row) && !empty($row['ID'])) {
+            $meta = get_post_meta($row['ID'], '_wp_attached_file');
+            $genpdf_folder = apply_filters('genpdf_get_signature_folder', '');
             //genpdf_vardie($genpdf_folder['basedir'].$meta[0]);
-            if( !empty($meta[0]) && file_exists($genpdf_folder['basedir'].$meta[0])){
-                return base64_encode(file_get_contents($genpdf_folder['basedir'].$meta[0]));
+            if (!empty($meta[0]) && file_exists($genpdf_folder['basedir'] . $meta[0])) {
+                return base64_encode(file_get_contents($genpdf_folder['basedir'] . $meta[0]));
             }
         }
         return null;
@@ -297,5 +299,63 @@ class OrderGenPDF
         return $wpdb->get_results($query, ARRAY_A);
     }
 
-    
+    public function isBonifico()
+    {
+        return (!empty($this->order['payment_method_title']) &&
+            is_string($this->order['payment_method_title']) &&
+            strpos(strtolower($this->order['payment_method_title']), 'bonifico') !== false) ? true : false;
+    }
+
+    /**
+     * create the attachment file on webserver
+     * @return $array with files path
+     */
+    public function getAttachmentsPDF(string $dir_pdf)
+    {
+        $attachments =  [];
+        $options_dompdf = new Options();
+        $options_dompdf->set('defaultFont', 'helvetica');
+        $options_dompdf->set('isRemoteEnabled', true);
+        $products = $this->getProductsDetail();
+        if (!empty($products)) {
+            foreach ($products as $product) {
+                if (!empty($product['meta_value']) && json_validate($product['meta_value'])) {
+                    $product_json = json_decode($product['meta_value'], true);
+                    // genpdf_vardie($customer_email, $product, $product_json);
+                    ob_clean();
+                    $dompdf = new Dompdf($options_dompdf);
+                    // genpdf_vardie($genpdf_order,$genpdf_order->getPDF($product_json['product_id']));
+                    $dompdf->loadHtml($this->getPDF($product_json['product_id']));
+                    $dompdf->render();
+                    $output = $dompdf->output();
+                    $tmp_path = tempnam($dir_pdf, "ordine#" . $this->order_id . "_") . '.pdf';
+                    file_put_contents($tmp_path, $output);
+                    $attachments[] = $tmp_path;
+                    ob_end_clean();
+                }
+            }
+        } else {
+            OrderEmailGenPDF::UpdateOrderEmail($this->order_id, [
+                "status" => "error",
+                "message" => "There aren't any products into the order."
+            ]);
+        }
+        return $attachments;
+    }
+
+    public function deleteAttachments(array $attachments)
+    {
+        if (!empty($attachments) && is_array($attachments) && count($attachments) > 0) {
+            foreach ($attachments as $file) {
+                unlink($file);
+            }
+        }
+    }
+
+    public function getCustomerInfo(){
+        global $wpdb;
+        $table = $wpdb->base_prefix."wc_order_addresses";
+        $query = $wpdb->prepare("SELECT * from {$table} where order_id =  %d limit 1",[$this->order_id]);
+        return $wpdb->get_row($query,ARRAY_A);
+    }
 }

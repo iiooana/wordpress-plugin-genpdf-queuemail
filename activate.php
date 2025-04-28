@@ -35,6 +35,7 @@ function genpdf_active(){
     next_time DATETIME DEFAULT(CURTIME()) NOT NULL,
     remaining_attemps INT DEFAULT(5) NOT NULL,
     info JSON,
+    has_sent_email_admin bool DEFAULT(false),
     created_at DATETIME DEFAULT(CURTIME()),
     updated_at DATETIME DEFAULT(CURTIME()),
     PRIMARY KEY(order_id),
@@ -45,6 +46,7 @@ function genpdf_active(){
   //region options
   add_option('_genpdf_logo_pdf','/wp-content/uploads/2025/04/img_pdf.png');
   add_option('_genpdf_id_current_template_pdf',1);
+  add_option('_genpdf_email_cc','');
   //endregion
 
 

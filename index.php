@@ -207,12 +207,12 @@ function genpdf_add_pages()
         __('TEST', 'genpdf-woocommerce'),
         __('TEST', 'genpdf-woocommerce'),
         'manage_options',
-        'genpdf_test',
-        'genpdf_test'
+        'genpdf_test_cron',
+        'genpdf_test_cron'
     );
 }
 add_action('admin_menu', 'genpdf_add_pages');
-function genpdf_test(){
+function genpdf_test_cron(){
     //genpdf_vardie("ok");
     do_action('genpdf_cron');
 }

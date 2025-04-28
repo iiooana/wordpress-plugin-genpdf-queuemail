@@ -91,4 +91,30 @@ class OrderEmailGenPDF
             error_log($message);
         }
     }
+    public static function setHasSentEmailAdmin(int $order_id){
+        global $wpdb;
+        $table = OrderEmailGenPDF::getTableName();
+        $date_time = date('Y-m-d H:i:s', current_time('timestamp'));
+        $is_updated = $wpdb->update(
+            $table,
+            array(
+                'has_sent_email_admin' => 1,
+                'updated_at' => $date_time,
+            ),
+            array(
+                'order_id' => $order_id,
+            ),
+            array(
+                '%d',
+                '%s',
+            ),
+            array(
+                '%d',
+            )
+        );
+        if($is_updated === false){
+            $message = var_export(["message" => "[ERROR-GENPDF006]-EMERGENCY CANNOT UPDATE THE TABLE {$table} on has_sent_email_admin", "order_id" => $order_id], true);
+            error_log($message);
+        }
+    }
 }
