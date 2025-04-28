@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Generate PDF
  * Description: Generate a PDF compiled of the order's data. View the history data of the "Contact Form Entries" plugin. 
- * Version: 0.3.7
+ * Version: 0.3.8
  * Author: Ioana
  * Text Domain: genpdf-woocommerce
  * Domain Path: /languages
@@ -170,8 +170,8 @@ add_filter('woocommerce_admin_order_actions', 'genpdf_buttons_orders', 100, 2);
 function genpdf_buttons_orders($actions, $order)
 {
     $timestamp =  $order->date_created->getTimestamp();
-    echo "order ".$order->id." -time ".$timestamp;
-    if (!empty($timestamp) && $timestamp >= 1745758835) {
+    //echo "order ".$order->id." -time ".$timestamp;
+    if (!empty($timestamp) && $timestamp > 1745843280) {
         $genpdf_order = new OrderGenPDF($order->id);
         $products = $genpdf_order->getProductsDetail();
         // genpdf_vardie($products);
