@@ -28,6 +28,20 @@ function genpdf_active(){
     FOREIGN KEY (template_id) REFERENCES {$prefix}_templates (id)
   )");
 
+  //tabel ORDERS_EMAIL
+  $table = $prefix."_orders_email";
+  maybe_create_table($table, "CREATE TABLE IF NOT EXISTS {$table} (
+    order_id BIGINT UNSIGNED NOT NULL UNIQUE,
+    next_time DATETIME DEFAULT(CURTIME()) NOT NULL,
+    remaining_attemps INT DEFAULT(5) NOT NULL,
+    info JSON,
+    created_at DATETIME DEFAULT(CURTIME()),
+    updated_at DATETIME DEFAULT(CURTIME()),
+    PRIMARY KEY(order_id),
+    FOREIGN KEY (order_id) REFERENCES {$wpdb->base_prefix}wc_orders (id)
+  )");
+  //endregion
+
   //region options
   add_option('_genpdf_logo_pdf','/wp-content/uploads/2025/04/img_pdf.png');
   add_option('_genpdf_id_current_template_pdf',1);

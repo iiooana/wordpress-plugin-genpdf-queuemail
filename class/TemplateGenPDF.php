@@ -22,13 +22,14 @@ class TemplateGenPDF
         if (empty($row) || empty($row['id'])) {
             $message = var_export(["message" => "Template not found", "id" => $id], true);
             error_log($message);
-            throw new \Exception($message, 1001);
-        }
-        $this->id = $row['id'];
-        $this->name = $row['name'];
-        $this->html =  $row['html'];
-        $this->created_at = $row['created_at'];
-        $this->update_at = $row['updated_at'];
+            //throw new \Exception($message, 1001);
+        }else{
+            $this->id = $row['id'];
+            $this->name = $row['name'];
+            $this->html =  $row['html'];
+            $this->created_at = $row['created_at'];
+            $this->update_at = $row['updated_at'];
+        }       
     }
 
 

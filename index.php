@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Generate PDF
  * Description: Generate a PDF compiled of the order's data. View the history data of the "Contact Form Entries" plugin. 
- * Version: 0.3.5
+ * Version: 0.3.6
  * Author: Ioana
  * Text Domain: genpdf-woocommerce
  * Domain Path: /languages
@@ -14,12 +14,14 @@ use GenPDF\GenPDF;
 use GenPDF\OrderGenPDF;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use GenPDF\OrderEmailGenPDF;
 
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 require_once plugin_dir_path(__FILE__) . 'activate.php';
 require_once plugin_dir_path(__FILE__) . 'digital_signature.php';
 require_once plugin_dir_path(__FILE__) . 'class/GenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'class/OldSubGenPDF.php';
+require_once plugin_dir_path(__FILE__) . 'class/OrderEmailGenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'class/AdminGenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'class/TemplateGenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'class/OrderGenPDF.php';
@@ -63,6 +65,9 @@ function genpdf_add_extra_order_meta($order_id)
 
     //region Save order_metadata
     if (!empty($products)) {
+        //region add order email to queue
+        new OrderEmailGenPDF($order_id);
+        //endregion
         foreach ($products as $item) {
             $product = $item->get_product(); //this is a product variantion
             if (!empty($product) && !empty($product->get_parent_id())) {
