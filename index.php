@@ -39,7 +39,12 @@ function genpdf_getPath()
     return  plugin_dir_path(__FILE__);
 }
 register_activation_hook(__FILE__, 'genpdf_active');
-wp_enqueue_style('genpdf_css', plugin_dir_url(__FILE__) . "css/general.css", array(), '1.2');
+
+function genpdf_css() {
+	wp_enqueue_style('genpdf_css', plugin_dir_url(__FILE__) . "css/general.css", array(), '1.2');
+}
+add_action( 'wp_enqueue_scripts', 'genpdf_css' );
+
 
 /**
  * Load the language, register new post type
