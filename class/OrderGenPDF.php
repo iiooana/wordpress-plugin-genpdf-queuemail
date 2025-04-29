@@ -389,15 +389,15 @@ class OrderGenPDF
         $options_dompdf->set('defaultFont', 'helvetica');
         $options_dompdf->set('isRemoteEnabled', true);
         $products = $this->getProductsDetail();
-        genpdf_vardie($products);
+
         if (!empty($products)) {
             foreach ($products as $product) {
                 if (!empty($product['meta_value']) && json_validate($product['meta_value'])) {
                     $product_json = json_decode($product['meta_value'], true);
-                    // genpdf_vardie($customer_email, $product, $product_json);
+                   
                     ob_clean();
                     $dompdf = new Dompdf($options_dompdf);
-                    // genpdf_vardie($genpdf_order,$genpdf_order->getPDF($product_json['product_id']));
+                   
                     $dompdf->loadHtml($this->getPDF($product_json['product_id']));
                     $dompdf->render();
                     $output = $dompdf->output();

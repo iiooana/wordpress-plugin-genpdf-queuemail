@@ -49,7 +49,6 @@ class OrderEmailGenPDF
         global $wpdb;
         $table = OrderEmailGenPDF::getTableName();
         $query = $wpdb->prepare("SELECT * FROM {$table} WHERE remaining_attemps > 0 AND next_time <= %s ORDER BY next_time ASC LIMIT 1 FOR UPDATE", [date('Y-m-d H:i:s', current_time('timestamp'))]);
-        var_dump("QUERY =>",$query);
         return $wpdb->get_row($query, ARRAY_A);
     }
 

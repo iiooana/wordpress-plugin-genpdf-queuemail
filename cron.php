@@ -29,7 +29,7 @@ add_action('genpdf_cron', function () {
 		if (!empty($order_queue)) {
 			$genpdf_order = new OrderGenPDF($order_queue['order_id']);
 			$customer_info = $genpdf_order->getCustomerInfo();
-			$customer_info['email'] = 'ioana2502@yahoo.it'; //todo remove and update the option on db
+		    //	genpdf_vardie($order_queue,$genpdf_order,$customer_info);
 			$attachments = $genpdf_order->getAttachmentsPDF($array_settings['temp_dir']);
 		
 			if (empty($attachments)) {
@@ -40,9 +40,10 @@ add_action('genpdf_cron', function () {
 				$wpdb->query("COMMIT");
 				die("There aren't any attachments for the email.");
 			}
-			genpdf_vardie("bonifico", $genpdf_order->order['status']);
+			//genpdf_vardie("bonifico", $genpdf_order->order['status']);
 			//region check if the payment is ok or not
 			if (!empty($genpdf_order->order['status']) && in_array($genpdf_order->order['status'], $array_settings['ok_status_order'])) {
+			    
 				if (!empty($customer_info['email']) && filter_var($customer_info['email'], FILTER_VALIDATE_EMAIL)) {
 					$message =  $array_settings['templates']['customer'];
 					$message = str_replace('[numero_ordine]', $genpdf_order->order_id, $message);
@@ -66,6 +67,7 @@ add_action('genpdf_cron', function () {
 						"message" => "The email " . $customer_info['email'] . " is not valid " . $array_settings['cc'] . "."
 					]);
 				}
+				
 			} else if ($genpdf_order->isBonifico()) {
 				if (empty($order_queue['has_sent_email_admin'])) {
 					//email only to admin
@@ -116,3 +118,4 @@ add_action('genpdf_cron', function () {
 	}
 
 });
+
