@@ -32,6 +32,9 @@ class AdminGenPDF
        
     }
 
+    /**
+     * include the view
+     */
     public function old_subscriptions()
     {        
         if( is_admin()){

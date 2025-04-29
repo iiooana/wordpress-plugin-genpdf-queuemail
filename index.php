@@ -42,7 +42,7 @@ register_activation_hook(__FILE__, 'genpdf_active');
 
 function genpdf_assets()
 {
-    wp_enqueue_style('genpdf_css', plugin_dir_url(__FILE__) . "css/general.css", array(), '1.2');
+    wp_enqueue_style('genpdf_css', plugin_dir_url(__FILE__) . "css/general.css", array(), '1.3');
 }
 add_action('admin_init', 'genpdf_assets');
 

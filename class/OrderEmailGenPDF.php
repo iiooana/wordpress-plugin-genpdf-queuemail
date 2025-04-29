@@ -12,6 +12,9 @@ class OrderEmailGenPDF
     private $created_at;
     private $updated_at;
 
+    /**
+     * Add the order on queue email
+     */
     public function __construct(int $order_id)
     {
         global $wpdb;
@@ -37,6 +40,9 @@ class OrderEmailGenPDF
         return GenPDF::getFullPrefix() . "_orders_email";
     }
 
+    /**
+     * @return array associative with all orders that are into the queue email
+     */
     public static function getOrdersToSendEmails()
     {
         global $wpdb;
@@ -45,6 +51,9 @@ class OrderEmailGenPDF
         return $wpdb->get_results($query, ARRAY_A);
     }
 
+    /**
+     * update queue email status of the order_di
+     */
     public static function UpdateOrderEmail(int $order_id, array $add_info, bool $is_ok = false)
     {
         global $wpdb;
@@ -91,6 +100,9 @@ class OrderEmailGenPDF
             error_log($message);
         }
     }
+    /**
+     * update the has_sent_email_admin column of the order
+     */
     public static function setHasSentEmailAdmin(int $order_id){
         global $wpdb;
         $table = OrderEmailGenPDF::getTableName();
@@ -117,6 +129,9 @@ class OrderEmailGenPDF
             error_log($message);
         }
     }
+    /**
+     * @return array of order's status that are acceptable 
+     */
     public static function getListAcceptsStatus(){
         return ['wc-processing','processing','wc-completed','completed'];
     }

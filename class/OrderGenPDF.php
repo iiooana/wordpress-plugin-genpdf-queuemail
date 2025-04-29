@@ -50,7 +50,7 @@ class OrderGenPDF
         }
     }
     /**
-     * @return array to all data for the pdf
+     * @return array to the customer data for the pdf
      */
     private function getArrayData()
     {
@@ -141,6 +141,9 @@ class OrderGenPDF
 
         return $order_data;
     }
+    /**
+     * @return array with product metadata linked to the order
+     */
     private function getOrderProductData(int $product_id)
     {
         $order_data = [];
@@ -256,16 +259,16 @@ class OrderGenPDF
         }
         return null;
     }
-    //tabella_dove_quando_crediti
+    /**
+     * TABLE DOVE - QUANDO - CREDITI
+     * @return html of this table built it dynamically
+     */
     private function getHTMLTabellaExtra($product)
     {
         $tmp['header'] = [];
         $tmp['body'] = [];
-        //genpdf_vardie($product);
         if (!empty($product['tabella_extra']) && is_array($product['tabella_extra'])) {
-            //genpdf_vardie($product['tabella_extra']);
             foreach ($product['tabella_extra'] as $column_name => $value) {
-               // genpdf_vardie($column_name,$value,$value[0],!empty($value[0]));
                 if (!empty($value[0])) {
                     switch ($column_name) {
                         case "has_column_where":
@@ -323,7 +326,9 @@ class OrderGenPDF
         return GenPDF::getFullPrefix() . "_orders_template";
     }
 
-
+    /**
+     * magic method 
+     */
     public function __get($name)
     {
         if (isset($this->{$name})) {
@@ -350,7 +355,7 @@ class OrderGenPDF
     }
 
     /**
-     * TODO: improve by json format in query
+     * TODO: improve by filterd with json format in query
      * @return products info
      */
     public function getProductsDetail()
@@ -361,6 +366,9 @@ class OrderGenPDF
         return $wpdb->get_results($query, ARRAY_A);
     }
 
+    /**
+     * @return if the payment menthod is bank trasnfer
+     */
     public function isBonifico()
     {
         return (!empty($this->order['payment_method_title']) &&
@@ -369,7 +377,7 @@ class OrderGenPDF
     }
 
     /**
-     * create the attachment file on webserver
+     * Generate the attachment on dir_pdf.
      * @return $array with files path
      */
     public function getAttachmentsPDF(string $dir_pdf)
@@ -405,6 +413,9 @@ class OrderGenPDF
         return $attachments;
     }
 
+    /**
+     * delete the attachments
+     */
     public function deleteAttachments(array $attachments)
     {
         if (!empty($attachments) && is_array($attachments) && count($attachments) > 0) {
@@ -414,6 +425,9 @@ class OrderGenPDF
         }
     }
 
+    /**
+     * @return the customer address info filtered by order
+     */
     public function getCustomerInfo()
     {
         global $wpdb;

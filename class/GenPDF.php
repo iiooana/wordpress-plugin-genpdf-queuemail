@@ -3,6 +3,9 @@ namespace GenPDF;
 class GenPDF {
     CONST PREFIX_TABLE ='genpdf';
 
+    /**
+     * @return the option save on db
+     */
     public function getOption(string $type){        
         return match($type){
             "logo" => get_option('_genpdf_logo_pdf'),
@@ -13,7 +16,7 @@ class GenPDF {
     }
 
     /**
-     * @return html logo
+     * @return img tag of logo
      */
     public function getLogo(){
         $logo_pdf = $this->getOption('logo');
@@ -24,7 +27,7 @@ class GenPDF {
     }
 
     /**
-     * @return the prefix of this plugin
+     * @return the db prefix of this plugin
      */
     public static function getFullPrefix(){
         global $wpdb;

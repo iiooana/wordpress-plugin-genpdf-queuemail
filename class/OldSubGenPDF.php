@@ -17,10 +17,16 @@ class OldSubGenPDF {
 
     //region GET
 
+    /**
+     * @return $search string
+     */
     public function getSearch(){
         return $this->search;
     }
 
+    /**
+     * @return count rows db
+     */
     public function getCount(){
         $query_prep = $this->db->prepare(
             "SELECT count(*) as n FROM {$this->db->base_prefix}vxcf_leads"
@@ -36,15 +42,24 @@ class OldSubGenPDF {
         return $this->db->get_var($query_prep);
     }
 
+    /**
+     * @return max_page 
+     */
     public function getMaxNumberPages(){
         $count = $this->getCount();
         $max_page = $count > 0 ? ceil( $count/$this->count_per_page) : 0;
         return $max_page > 0 ?  $max_page : 1 ;
     }
+    /**
+     * @return current_page
+     */
     public function getCurrentPage(){
         return $this->current_page;
     }
 
+    /**
+     *  @return an array with data for the current page
+     */
     public function getData(){
         $query_prep = $this->db->prepare(
             "SELECT id,url,created
@@ -69,6 +84,9 @@ class OldSubGenPDF {
         return $this->db->get_results($query_prep, ARRAY_A);
 
     }
+    /**
+     * @return the lead filter by $lead_id
+     */
     public function getLead(int $lead_id){
         $query_prep = $this->db->prepare("
         SELECT * FROM
@@ -78,6 +96,9 @@ class OldSubGenPDF {
         return $this->db->get_row($query_prep,ARRAY_A);
     }
 
+    /**
+     * @return an array with short information
+     */
     public function getShortDetail(int $lead_id){  
         $query_nome = $this->db->prepare(
             "SELECT value from {$this->db->base_prefix}vxcf_leads_detail where lead_id=%d and name=%s limit 1",
@@ -92,6 +113,9 @@ class OldSubGenPDF {
            "cognome" => $this->db->get_row($query_cognome,ARRAY_A)['value']
         ];
     }
+    /**
+     * @return @array of all data filterd by $lead_it
+     */
     public function getDetail($lead_id){
         $query = $this->db->prepare("SELECT * from {$this->db->base_prefix}vxcf_leads_detail where lead_id=%d order by id asc",[$lead_id]);
         return $this->db->get_results($query,ARRAY_A);
@@ -100,9 +124,15 @@ class OldSubGenPDF {
     //endregion
 
     //region SET
+    /**
+     * Set the current page
+     */
     public function setCurrentPage(int $n){
         $this->current_page = $n;
     }
+    /**
+     * Set the search string
+     */
     public function setSearch(string $search = null){
         $this->search = null;
         if( !empty($search) && !empty(trim($search)) ){
