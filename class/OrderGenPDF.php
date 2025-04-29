@@ -59,6 +59,7 @@ class OrderGenPDF
         $order_data = [];
         $order_data['logo_pdf'] = $gen_pdf->getLogo() ?? '';
         $order_data['ragione_sociale'] = '';
+        $order_data['azienda_provincia'] = '';
 
         //region customer address
         $customer_address = $this->getCustomerAddress();
