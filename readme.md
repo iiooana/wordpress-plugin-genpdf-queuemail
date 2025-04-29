@@ -1,15 +1,6 @@
 # 1. PLUGIN THAT GENERATE PDF
 
-This plugin sets the scheme of templates and courses in the database.
-The goal is to generate a PDF with dynamic data.
-
-After that, I will create a queue to attach that PDF to emails.
-
-TODO
- - add plugin istruction
- - meta data
- - download pdf
- - button download pdf
+This plugin generate dynamically the PDF from DB data.
 
 
 ## 1.1. TRANSLATE USGIN i18n
@@ -29,3 +20,13 @@ it_IT.po
 ## 1.2 Folder wp-content/signatures
 
 To protect the access of the customer's signature, I create a folder wp-content/signatures where all signatures will be saved.
+
+
+## 1.3 PDF
+<ul>
+<li>In the table _templates there is the list of templates. To change the PDF template, it is important to create new row in DB and update the id of "_genpdf_id_current_template_pdf" option. Never modify the current HTML of the DB table.</li>
+<li>Some dynamic fields of PDF are from customer data, and some from the product; therefore, by ACF in the admin panel, I created new fields of the product. For the same reason, after the order creation, the plugin saves product metadata into the wc_orders_meta linked to the order_id. In this way, we can guarantee the correct data in case the product is updated in the future. </li>
+<li>In the order list, there are buttons to download a PDF or send an email to the customer with attachments</li>
+<li>After each order with successful payments, the customer will receive an email with all attachments.</li>
+<li>To generate the PDF, I use Dompdf, unfortunately, I commit the vendor folder beacuse I don't have control over the website hosting. Usually the folder vendor is never committed, only the composer.json and composer.lock.</li>
+</ul>
