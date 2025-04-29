@@ -41,14 +41,16 @@ class OrderEmailGenPDF
     }
 
     /**
+     * REMEMBER TO USE START TRANSACTION - COMIT
      * @return array associative with all orders that are into the queue email
      */
-    public static function getOrdersToSendEmails()
+    public static function getOrderToSendEmail()
     {
         global $wpdb;
         $table = OrderEmailGenPDF::getTableName();
-        $query = $wpdb->prepare("SELECT * FROM {$table} where remaining_attemps > 0 and next_time <= %s", [date('Y-m-d H:i:s', current_time('timestamp'))]);
-        return $wpdb->get_results($query, ARRAY_A);
+        $query = $wpdb->prepare("SELECT * FROM {$table} WHERE remaining_attemps > 0 AND next_time <= %s ORDER BY next_time ASC LIMIT 1 FOR UPDATE", [date('Y-m-d H:i:s', current_time('timestamp'))]);
+        var_dump("QUERY =>",$query);
+        return $wpdb->get_row($query, ARRAY_A);
     }
 
     /**

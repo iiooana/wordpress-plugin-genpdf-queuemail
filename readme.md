@@ -1,6 +1,6 @@
 # 1. PLUGIN THAT GENERATE PDF
 
-This plugin generate dynamically the PDF from DB data.
+This plugin generate dynamically PDF files from DB data.
 
 
 ## 1.1. TRANSLATE USGIN i18n

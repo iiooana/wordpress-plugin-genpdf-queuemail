@@ -65,9 +65,7 @@ function genpdf_add_extra_order_meta($order_id)
 {
     global $wpdb;
     $genpdf = new GenPDF();
-    //get the order
     $order = wc_get_order($order_id);
-    //get the products of the order
     $products = $order->get_items();
 
     //region Save order_metadata
@@ -172,11 +170,9 @@ function genpdf_buttons_orders($actions, $order)
 {
     $timestamp =  $order->date_created->getTimestamp();
     $array_status = OrderEmailGenPDF::getListAcceptsStatus();
-    //echo "order ".$order->id." -time ".$timestamp;
     if (!empty($timestamp) && $timestamp > 1745843280) {
         $genpdf_order = new OrderGenPDF($order->id);
         $products = $genpdf_order->getProductsDetail();
-        // genpdf_vardie($products);
         if (!empty($products)) {
             foreach ($products as $item) {
                 if (!empty($item['meta_value']) && json_validate($item['meta_value'])) {
@@ -242,7 +238,7 @@ add_action('admin_menu', 'genpdf_add_pages');
 function genpdf_test_cron()
 {
     //todo remove this function
-    do_action('genpdf_cron');
+  //  do_action('genpdf_cron');
 }
 
 function genpdf_download_pdf()

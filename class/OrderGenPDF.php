@@ -58,6 +58,7 @@ class OrderGenPDF
 
         $order_data = [];
         $order_data['logo_pdf'] = $gen_pdf->getLogo() ?? '';
+        $order_data['ragione_sociale'] = '';
 
         //region customer address
         $customer_address = $this->getCustomerAddress();
@@ -363,6 +364,7 @@ class OrderGenPDF
         global $wpdb;
         $table = $wpdb->prefix . "wc_orders_meta";
         $query = $wpdb->prepare("select meta_value from {$table} where order_id =  %d and meta_key =  %s ", [$this->order_id, 'product_detail']);
+        var_dump("<br>",$query);
         return $wpdb->get_results($query, ARRAY_A);
     }
 
@@ -387,6 +389,7 @@ class OrderGenPDF
         $options_dompdf->set('defaultFont', 'helvetica');
         $options_dompdf->set('isRemoteEnabled', true);
         $products = $this->getProductsDetail();
+        genpdf_vardie($products);
         if (!empty($products)) {
             foreach ($products as $product) {
                 if (!empty($product['meta_value']) && json_validate($product['meta_value'])) {
