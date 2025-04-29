@@ -364,7 +364,6 @@ class OrderGenPDF
         global $wpdb;
         $table = $wpdb->prefix . "wc_orders_meta";
         $query = $wpdb->prepare("select meta_value from {$table} where order_id =  %d and meta_key =  %s ", [$this->order_id, 'product_detail']);
-        var_dump("<br>",$query);
         return $wpdb->get_results($query, ARRAY_A);
     }
 
