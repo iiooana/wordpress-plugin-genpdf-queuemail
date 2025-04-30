@@ -10,8 +10,18 @@ class GenPDF {
         return match($type){
             "logo" => get_option('_genpdf_logo_pdf'),
             "template" => get_option('_genpdf_id_current_template_pdf'),
-            "email_cc" => get_option('_genpdf_email_cc'),
-            "blogname" => get_option('blogname')
+            "emails_cc" => get_option('_genpdf_email_cc'),
+            "admin_email_template" => get_option('_genpdf_id_admin_template_email'),
+            "customer_email_template" => get_option('_genpdf_id_customer_template_email'),
+        };
+    }
+
+    public function updateOption(string $type, string|int $value){
+        return match($type){
+            "logo" => update_option('_genpdf_logo_pdf',$value),
+            "emails_cc" => update_option('_genpdf_email_cc',$value),
+            "admin_email_template" => update_option('_genpdf_id_admin_template_email',$value),
+            "customer_email_template" => update_option('_genpdf_id_customer_template_email',$value),
         };
     }
 
@@ -20,8 +30,11 @@ class GenPDF {
      */
     public function getLogo(){
         $logo_pdf = $this->getOption('logo');
-        if(!empty($logo_pdf) && strlen($logo_pdf) !== false){
-           return "<img src=".get_site_url(null, $logo_pdf)." style='width:100%;'>";
+        if(!empty($logo_pdf) && strlen($logo_pdf) !== false){            
+            if(strpos($logo_pdf,get_site_url())){
+                $logo_pdf = get_site_url(null, $logo_pdf);
+            }
+           return "<img src=".$logo_pdf." style='width:100%;'>";
         }
         return null;
     }
@@ -33,17 +46,31 @@ class GenPDF {
         global $wpdb;
         return $wpdb->base_prefix.GenPDF::PREFIX_TABLE;
     }
-
+    /**
+     * @return array of emails
+     */
+    public function fromStringEmailsToArray(string $emails){
+        $array_email = [];
+        $array_email[]= $emails;
+        if (strpos($emails, ",")) {
+            $array_email = explode(",", $emails);
+        }
+        return $array_email; 
+    }    
     /**
      * @return array of common settings
      */
     public function getArraySettings(){
         $array_settings = [];
-        $array_settings['cc'] = $this->getOption("email_cc");
-        $array_settings['cc']  = 'ioanaudia7@gmail.com'; //todo remove 
+        $array_settings['cc'] = $this->fromStringEmailsToArray( $this->getOption("emails_cc") );
         $array_settings['temp_dir'] = sys_get_temp_dir();
-        $array_settings['templates']['customer'] = file_get_contents(genpdf_getPath()."/templates/customer.html");
-        $array_settings['templates']['admin'] = file_get_contents(genpdf_getPath()."/templates/admin.html");
+
+        $template_customer = new TemplateEmailGenPDF(intval($this->getOption('customer_email_template')));     
+        $array_settings['templates']['customer'] = $template_customer->getHtml();
+        
+        $template_admin = new TemplateEmailGenPDF(intval($this->getOption('admin_email_template')));      
+        $array_settings['templates']['admin'] = $template_admin->getHtml();
+        
         $array_settings['ok_status_order'] = OrderEmailGenPDF::getListAcceptsStatus();
         return $array_settings;
     }

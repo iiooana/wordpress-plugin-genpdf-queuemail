@@ -4,13 +4,66 @@ if (!is_admin()) {
 } ?>
 <div class="wrap">
     <h1 class="wp-heading-inline"><?= __('GenPDF settings', 'genpdf-woocommerce') ?></h1>
-    <form action="?" method="post">
-        <input type="hidden" name="page" value="genpdf_settings">
+    <form action="?page=genpdf_settings" method="post">
         <? wp_nonce_field('genpdf_settings', 'genpdf_settings_value') ?>
-        <h2><?__("Logo","genpdf-woocommcerce")?></h2>
-        <p><?__("Set the link of the logo to insert into the pdf","genpdf-woocommerce")?></p>
-        
-
-        <button class="button"><?= __('Save', 'genpdf-woocommerce') ?></button>
+        <table class="form-table indent-children" role="presentation" width="100%" id="genpdf_table">
+            <tbody>
+                <tr>
+                    <td><strong>Logo - Set the link of the logo to insert into the pdf</strong></td>
+                    <td>
+                        <div style="max-height: 200px; max-width: 400px;">
+                            <?= $genpdf->getLogo() ?>
+                        </div>
+                        <input type="url" name="logo" value="<?= $genpdf->getOption('logo') ?>" pattern="https://.*" style="width:100%" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p><strong>List of emails separated by ","</strong></p>
+                        <p>Add one or more to receive the email order with attachments.</p>
+                    </td>
+                    <td>
+                        <input type="text" name="admin_emails" value="<?= $genpdf->getOption('emails_cc') ?>" requiredd>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p><strong>Template email customer</strong></p>
+                    </td>
+                    <td>
+                        <? $template_id =$genpdf->getOption('customer_email_template');?>
+                        <select name="customer_email_template" required>
+                            <option value="" selected></option>
+                            <? if (!empty($list_template)) {
+                                foreach ($list_template as $template) { ?>
+                                    <option value="<?= $template->ID ?>" <?= $template->ID == $template_id ? 'selected' : '' ?>><?= $template->post_title ?></option>
+                            <? }
+                            } ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p><strong>Template email admin</strong></p>
+                    </td>
+                    <td>
+                    <? $template_id =$genpdf->getOption('admin_email_template');?>
+                        <select name="admin_email_template" required>
+                            <option value="" selected></option>
+                            <? if (!empty($list_template)) {
+                                foreach ($list_template as $template) { ?>
+                                    <option value="<?= $template->ID ?>" <?= $template->ID == $template_id ? 'selected' : '' ?>><?= $template->post_title ?></option>
+                            <? }
+                            } ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: center;">
+                        <button class="button"><?= __('Save', 'genpdf-woocommerce') ?></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </form>
 </div>

@@ -20,5 +20,11 @@
     border: none !important;
 }
 .genpdf_btn_send_attachments::after{
-    content: "Invia allegati";
+    content: "Invia allegati al cliente";
+}
+#genpdf_table > tbody > tr > td  input{
+    width: 100% ;
+}
+#genpdf_table > tbody > tr > td  select{
+    width: 100% ;
 }

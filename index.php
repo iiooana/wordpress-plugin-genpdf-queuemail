@@ -20,6 +20,7 @@ use GenPDF\OrderEmailGenPDF;
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 require_once plugin_dir_path(__FILE__) . 'activate.php';
 require_once plugin_dir_path(__FILE__) . 'digital_signature.php';
+require_once plugin_dir_path(__FILE__) . 'class/TemplateEmailGenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'class/GenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'class/OldSubGenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'class/OrderEmailGenPDF.php';
@@ -44,7 +45,7 @@ register_activation_hook(__FILE__, 'genpdf_active');
 
 function genpdf_assets()
 {
-    wp_enqueue_style('genpdf_css', plugin_dir_url(__FILE__) . "css/general.css", array(), '1.3');
+    wp_enqueue_style('genpdf_css', plugin_dir_url(__FILE__) . "css/general.css", array(), '1.4');
 }
 add_action('admin_init', 'genpdf_assets');
 function genpdf_register_post_type()
@@ -69,8 +70,8 @@ function genpdf_register_post_type()
                     'not_found_in_trash' => __('No Template found in Trash'),
                 ],
                 "description" => __("Template email used by GenPDF plugin", "genpdf-woocommerce"),
-                "exclude_from_search" => false,
-                "publicly_queryable" => true,
+                "exclude_from_search" => true,
+                "publicly_queryable" => false,
                 "show_ui" => true,
                 "show_in_menu" => true,
                 "public" => true,
@@ -78,12 +79,40 @@ function genpdf_register_post_type()
                 'menu_position' => 40,
                 "menu_icon" => "dashicons-email",
                 "supports" => ['title', 'editor','revisions','author'],
+                'capabilities' => [
+                    'edit_post'           => 'edit_genpdf_template',
+                    'read_post'           => 'read_genpdf_template',
+                    'delete_post'         => 'delete_genpdf_template',
+                    'edit_posts'          => 'edit_genpdf_templates',
+                    'edit_others_posts'   => 'edit_others_genpdf_templates',
+                    'read_private_posts'  => 'read_private_genpdf_templates',
+                ],
             ]
         );
     }
 }
 
 add_action('init', 'genpdf_register_post_type');
+
+add_filter('pre_trash_post', 'genpdf_prevent_delete_template', 10, 2);
+function genpdf_prevent_delete_template($trash, $post) {
+    if ($post->post_type === 'genpdf_template') {
+        $genpdf = new GenPDF;
+        if($post->ID == $genpdf->getOption('admin_email_template') || $post->ID == $genpdf->getOption('customer_email_template')){
+            wp_redirect(add_query_arg('genpdf_error_delete_template', '1', admin_url('edit.php?post_type=genpdf_template')));
+            exit;
+        }        
+    }
+    return $trash;
+}
+add_action('admin_notices', 'genpdf_alerts');
+
+function genpdf_alerts() {
+    if (isset($_GET['genpdf_error_delete_template'])) { ?>
+         <div class="notice notice-error is-dismissible"><p>You can't trash the template beacuse it is used, to change go into <em>GenPDF settings</em>.</p></div>
+    <? }
+}
+
 /**
  * Load the language, register new post type
  */
@@ -228,7 +257,7 @@ function genpdf_buttons_orders($actions, $order)
             if (!empty($order->status) && in_array($order->status, $array_status)) {
                 $actions[] = [
                     "url" => admin_url('admin.php?page=genpdf_send_attachments&order_id=' . $order->id),
-                    "name" => "Invia allegati per email",
+                    "name" => "Invia allegati al cliente",
                     "action" => "genpdf_btn_send_attachments"
                 ];
             }
@@ -245,7 +274,7 @@ function genpdf_add_pages()
 {
     //region page to download pdf
     //todo remove from options menu....
-    add_plugins_page(
+    add_submenu_page(null,
         __('Download PDF', 'genpdf-woocommerce'),
         __('Download PDF', 'genpdf-woocommerce'),
         'manage_options',
@@ -255,7 +284,7 @@ function genpdf_add_pages()
     //endregion
 
     //region to add sendemail
-    add_plugins_page(
+    add_submenu_page(null,
         __('Send attachments', 'genpdf-woocommerce'),
         __('Send attachments', 'genpdf-woocommerce'),
         'manage_options',
@@ -263,6 +292,13 @@ function genpdf_add_pages()
         'genpdf_send_attachments',
     );
     //endregion
+    add_submenu_page(null,
+        __('Send genpdf_cron', 'genpdf-woocommerce'),
+        __('Send genpdf_cron', 'genpdf-woocommerce'),
+        'manage_options',
+        'genpdf_cron',
+        'genpdf_cron',
+    );
 
 }
 add_action('admin_menu', 'genpdf_add_pages');
@@ -334,7 +370,12 @@ function genpdf_send_attachments()
         if ($is_updated === false) {
             echo "<h1>Si è verificato un'errore, contattare l'assistenza</h1>";
         } else {
-            echo "<h1>A breve verrà inviata la mail, puoi chiudere la pagina.</h1>";
+            echo "<h1>A breve verrà inviata la mail.</h1><a class='button' href=".$_SERVER['HTTP_REFERER'].">Torna indietro</a>";
         }
     }
+}
+
+//TODO REMOVE
+function genpdf_cron(){
+    do_action('genpdf_cron');
 }

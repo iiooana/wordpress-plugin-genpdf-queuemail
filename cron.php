@@ -23,15 +23,16 @@ add_action('genpdf_cron', function () {
 	global $wpdb;
 	$genpdf = new GenPDF();
 	$array_settings = $genpdf->getArraySettings();
+	genpdf_vardie($array_settings);
 	$wpdb->query("START TRANSACTION");
 	try {
 		$order_queue = OrderEmailGenPDF::getOrderToSendEmail();	
 		if (!empty($order_queue)) {
 			$genpdf_order = new OrderGenPDF($order_queue['order_id']);
 			$customer_info = $genpdf_order->getCustomerInfo();
-		    //	genpdf_vardie($order_queue,$genpdf_order,$customer_info);
-			$attachments = $genpdf_order->getAttachmentsPDF($array_settings['temp_dir']);
-		
+
+			//region generate attachments
+			$attachments = $genpdf_order->getAttachmentsPDF($array_settings['temp_dir']);		
 			if (empty($attachments)) {
 				OrderEmailGenPDF::UpdateOrderEmail($order_queue['order_id'], [
 					"status" => "error",
@@ -40,17 +41,23 @@ add_action('genpdf_cron', function () {
 				$wpdb->query("COMMIT");
 				die("There aren't any attachments for the email.");
 			}
-			//genpdf_vardie("bonifico", $genpdf_order->order['status']);
-			//region check if the payment is ok or not
+			//endregion
+
+			//check if the order status is ok
 			if (!empty($genpdf_order->order['status']) && in_array($genpdf_order->order['status'], $array_settings['ok_status_order'])) {
-			    
 				if (!empty($customer_info['email']) && filter_var($customer_info['email'], FILTER_VALIDATE_EMAIL)) {
 					$message =  $array_settings['templates']['customer'];
 					$message = str_replace('[numero_ordine]', $genpdf_order->order_id, $message);
 					$message = str_replace('[nome_cliente]', $customer_info['first_name'], $message);
-					$message = str_replace('[blogname]', $genpdf->getOption('blogname'), $message);
 					$headers = array('Content-Type: text/html; charset=UTF-8');
-					if (wp_mail($customer_info['email'], "Ordine #" . $genpdf_order->order_id . " - Bonifico", $message, $headers, $attachments)) {
+					//region add CC
+					if(!empty($array_settings['cc']) && is_array($array_settings['cc'])){
+						foreach($array_settings['cc'] as $email){
+							$headers[] = 'Cc: <'.$email.'>';
+						}
+					}
+					//endregion
+					if (wp_mail($customer_info['email'], "Ordine #" . $genpdf_order->order_id , $message, $headers, $attachments)) {
 						OrderEmailGenPDF::UpdateOrderEmail($order_queue['order_id'], [
 							"status" => "success_email_customer",
 							"email_to" => $customer_info['email'],
@@ -72,15 +79,21 @@ add_action('genpdf_cron', function () {
 				if (empty($order_queue['has_sent_email_admin'])) {
 					//email only to admin
 					if (!empty($array_settings['cc']) && filter_var($array_settings['cc'], FILTER_VALIDATE_EMAIL)) {
-					
 						$message =  $array_settings['templates']['admin'];
 						$message = str_replace('[numero_ordine]', $genpdf_order->order_id, $message);
 						$message = str_replace('[nome_cliente]', $customer_info['first_name'], $message);
 						$message = str_replace('[cognome_nome]', $customer_info['last_name'], $message);
-						$message = str_replace('[blogname]', $genpdf->getOption('blogname'), $message);
-				
+							//region add CC
+							if(!empty($array_settings['cc']) && is_array($array_settings['cc'])){
+								foreach($array_settings['cc'] as $j => $email){
+									if($j > 0){
+										$headers[] = 'Cc: <'.$email.'>';
+									}
+								}
+							}
+							//endregion
 						$headers = array('Content-Type: text/html; charset=UTF-8');
-						if (wp_mail($array_settings['cc'], "Ordine #" . $genpdf_order->order_id . " - Bonifico", $message, $headers, $attachments)) {
+						if (wp_mail($array_settings['cc'][0], "Ordine #" . $genpdf_order->order_id . " - Bonifico", $message, $headers, $attachments)) {
 							
 							OrderEmailGenPDF::UpdateOrderEmail($order_queue['order_id'], [
 								"status" => "success_email_admin",
@@ -104,7 +117,7 @@ add_action('genpdf_cron', function () {
 				}
 			} else {
 				OrderEmailGenPDF::UpdateOrderEmail($order_queue['order_id'], [
-					"status" => "error",
+					"status" => "payment_pending",
 					"message" => "The status order is: " . $genpdf_order->order['status'] . "."
 				]);
 			}
