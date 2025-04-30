@@ -16,6 +16,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use GenPDF\OrderEmailGenPDF;
 
+
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 require_once plugin_dir_path(__FILE__) . 'activate.php';
 require_once plugin_dir_path(__FILE__) . 'digital_signature.php';
@@ -40,13 +41,49 @@ function genpdf_getPath()
 }
 register_activation_hook(__FILE__, 'genpdf_active');
 
+
 function genpdf_assets()
 {
     wp_enqueue_style('genpdf_css', plugin_dir_url(__FILE__) . "css/general.css", array(), '1.3');
 }
 add_action('admin_init', 'genpdf_assets');
+function genpdf_register_post_type()
+{
+    if (is_admin()) {
+        register_post_type(
+            'genpdf_template',
+            [
+                "label" => __('GenPDF Template Email', 'genpdf-woocommerce'),
+                'labels' => [
+                    'name' => __('GenPDF Templates'),
+                    'singular_name' => __('GenPDF Template Email'),
+                    'add_new' => __('Add Template Email'),
+                    'add_new_item' => __('Add New Template'),
+                    'edit' => __('Edit Template'),
+                    'edit_item' => __('Edit Template'),
+                    'new_item' => __('Add New Template'),
+                    'view' => __('View Template'),
+                    'view_item' => __('View Template'),
+                    'search_items' => __('Search Template'),
+                    'not_found' => __('No Template Found'),
+                    'not_found_in_trash' => __('No Template found in Trash'),
+                ],
+                "description" => __("Template email used by GenPDF plugin", "genpdf-woocommerce"),
+                "exclude_from_search" => false,
+                "publicly_queryable" => true,
+                "show_ui" => true,
+                "show_in_menu" => true,
+                "public" => true,
+                "show_in_rest" => false,
+                'menu_position' => 40,
+                "menu_icon" => "dashicons-email",
+                "supports" => ['title', 'editor','revisions','author'],
+            ]
+        );
+    }
+}
 
-
+add_action('init', 'genpdf_register_post_type');
 /**
  * Load the language, register new post type
  */
@@ -207,6 +244,7 @@ function genpdf_buttons_orders($actions, $order)
 function genpdf_add_pages()
 {
     //region page to download pdf
+    //todo remove from options menu....
     add_plugins_page(
         __('Download PDF', 'genpdf-woocommerce'),
         __('Download PDF', 'genpdf-woocommerce'),
@@ -225,22 +263,9 @@ function genpdf_add_pages()
         'genpdf_send_attachments',
     );
     //endregion
-    //todo remove
-    add_plugins_page(
-        __('TEST', 'genpdf-woocommerce'),
-        __('TEST', 'genpdf-woocommerce'),
-        'manage_options',
-        'genpdf_test_cron',
-        'genpdf_test_cron'
-    );
+
 }
 add_action('admin_menu', 'genpdf_add_pages');
-function genpdf_test_cron()
-{
-    //todo remove this function
-  //  do_action('genpdf_cron');
-}
-
 function genpdf_download_pdf()
 {
     if (
@@ -284,13 +309,13 @@ function genpdf_send_attachments()
         $row = $wpdb->get_row($query, ARRAY_A);
         $info = json_decode($row['info'], true);
         $date_time = date('Y-m-d H:i:s', current_time('timestamp'));
-        $info[$date_time] = ['message'=> "Aggiunto alla coda dal id_utente_wp = ".get_current_user_id()];
+        $info[$date_time] = ['message' => "Aggiunto alla coda dal id_utente_wp = " . get_current_user_id()];
         $is_updated = $wpdb->update(
             $table,
             array(
                 'remaining_attemps' => 1,
                 'info' => json_encode($info),
-                'next_time' => date('Y-m-d H:i:s', intval(current_time('timestamp')) + 120 ),
+                'next_time' => date('Y-m-d H:i:s', intval(current_time('timestamp')) + 120),
                 'updated_at' => $date_time,
             ),
             array(
@@ -306,9 +331,9 @@ function genpdf_send_attachments()
                 '%d',
             )
         );
-        if($is_updated === false){
+        if ($is_updated === false) {
             echo "<h1>Si è verificato un'errore, contattare l'assistenza</h1>";
-        }else{
+        } else {
             echo "<h1>A breve verrà inviata la mail, puoi chiudere la pagina.</h1>";
         }
     }

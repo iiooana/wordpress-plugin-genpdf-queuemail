@@ -19,16 +19,17 @@ class AdminGenPDF
         return 'dashicons-id-alt';
     }
     public function addMenu()
-    {
-     /*   add_menu_page(
-            __('Subscriptions from old website','genpdf-woocommerce'),
-            __('Subs. old website','genpdf-woocommerce'),
+    {     
+
+        add_menu_page(
+            __('GenPDF settings','genpdf-woocommerce'),
+            __('GenPDF settings','genpdf-woocommerce'),
             'manage_options',
-            'genpdf_data',
-            [$this, 'old_subscriptions'],
+            'genpdf_settings',
+            [$this,'genpdf_settings'],
             $this->icon(),
-            10
-        );*/
+            40,
+        );
        
     }
 
@@ -41,5 +42,11 @@ class AdminGenPDF
             $subs = new OldSubGenPDF();
             include_once(genpdf_getPath().'/views/old_subscritions.php');
         }      
-    }   
+    }
+    
+    public function genpdf_settings(){
+        if(is_admin()){
+            include_once(genpdf_getPath().'/views/settings_page.php');
+        }
+    }
 }
