@@ -23,7 +23,6 @@ add_action('genpdf_cron', function () {
 	global $wpdb;
 	$genpdf = new GenPDF();
 	$array_settings = $genpdf->getArraySettings();
-	genpdf_vardie($array_settings);
 	$wpdb->query("START TRANSACTION");
 	try {
 		$order_queue = OrderEmailGenPDF::getOrderToSendEmail();	
@@ -43,17 +42,20 @@ add_action('genpdf_cron', function () {
 			}
 			//endregion
 
-			//check if the order status is ok
+			//region CHECKS
 			if (!empty($genpdf_order->order['status']) && in_array($genpdf_order->order['status'], $array_settings['ok_status_order'])) {
+				//1. STATUS ORDER OK
 				if (!empty($customer_info['email']) && filter_var($customer_info['email'], FILTER_VALIDATE_EMAIL)) {
+					//1a. check if the customer email is valid
 					$message =  $array_settings['templates']['customer'];
 					$message = str_replace('[numero_ordine]', $genpdf_order->order_id, $message);
 					$message = str_replace('[nome_cliente]', $customer_info['first_name'], $message);
+						$message = str_replace('[cognome_nome]', $customer_info['last_name'], $message);
 					$headers = array('Content-Type: text/html; charset=UTF-8');
 					//region add CC
 					if(!empty($array_settings['cc']) && is_array($array_settings['cc'])){
 						foreach($array_settings['cc'] as $email){
-							$headers[] = 'Cc: <'.$email.'>';
+							$headers[] = "cc: $email <$email>";
 						}
 					}
 					//endregion
@@ -71,28 +73,30 @@ add_action('genpdf_cron', function () {
 				} else {
 					OrderEmailGenPDF::UpdateOrderEmail($order_queue['order_id'], [
 						"status" => "error",
-						"message" => "The email " . $customer_info['email'] . " is not valid " . $array_settings['cc'] . "."
+						"message" => "The email " . $customer_info['email'] . " is not valid ."
 					]);
 				}
 				
 			} else if ($genpdf_order->isBonifico()) {
+				//2. Check if the payment method "Bonifico"
 				if (empty($order_queue['has_sent_email_admin'])) {
-					//email only to admin
-					if (!empty($array_settings['cc']) && filter_var($array_settings['cc'], FILTER_VALIDATE_EMAIL)) {
+					// First email to admins
+					if (!empty($array_settings['cc'][0]) && filter_var($array_settings['cc'][0], FILTER_VALIDATE_EMAIL)) {
 						$message =  $array_settings['templates']['admin'];
 						$message = str_replace('[numero_ordine]', $genpdf_order->order_id, $message);
 						$message = str_replace('[nome_cliente]', $customer_info['first_name'], $message);
 						$message = str_replace('[cognome_nome]', $customer_info['last_name'], $message);
+						$headers = array('Content-Type: text/html; charset=UTF-8');
 							//region add CC
 							if(!empty($array_settings['cc']) && is_array($array_settings['cc'])){
 								foreach($array_settings['cc'] as $j => $email){
 									if($j > 0){
-										$headers[] = 'Cc: <'.$email.'>';
+										$headers[] = "cc: $email <$email>";
 									}
 								}
 							}
 							//endregion
-						$headers = array('Content-Type: text/html; charset=UTF-8');
+							
 						if (wp_mail($array_settings['cc'][0], "Ordine #" . $genpdf_order->order_id . " - Bonifico", $message, $headers, $attachments)) {
 							
 							OrderEmailGenPDF::UpdateOrderEmail($order_queue['order_id'], [
@@ -111,22 +115,23 @@ add_action('genpdf_cron', function () {
 					} else {
 						OrderEmailGenPDF::UpdateOrderEmail($order_queue['order_id'], [
 							"status" => "error",
-							"message" => "There is not email for option _genpdf_email_cc " . $array_settings['cc'] . "."
+							"message" => "There is not email for option _genpdf_email_cc or is not valid " . var_export($array_settings['cc'],true) . "."
 						]);
 					}
 				}
 			} else {
 				OrderEmailGenPDF::UpdateOrderEmail($order_queue['order_id'], [
 					"status" => "payment_pending",
-					"message" => "The status order is: " . $genpdf_order->order['status'] . "."
+					"message" => "The status order is: " . $genpdf_order->order['status'] . " and the payment method is not bonifico."
 				]);
 			}
+			//endregion
 			$genpdf_order->deleteAttachments($attachments);
 		}
 		$wpdb->query("COMMIT");
 	} catch (\Exception $e) {
-		//always commit
 		var_dump("[ERROR-GENPDF-CRON]".$e->getMessage());
+		//always commit
 		$wpdb->query("COMMIT");
 	}
 

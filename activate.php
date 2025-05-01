@@ -47,7 +47,7 @@ function genpdf_active(){
   add_option('_genpdf_logo_pdf','/wp-content/uploads/2025/04/img_pdf.png');
   add_option('_genpdf_id_current_template_pdf',1);
   add_option('_genpdf_id_admin_template_email','');
-  add_option('_genpdf_id_custoomer_template_email','');
+  add_option('_genpdf_id_customer_template_email','');
   add_option('_genpdf_email_cc','');
   //endregion
 

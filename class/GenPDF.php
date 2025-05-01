@@ -64,9 +64,9 @@ class GenPDF {
         $array_settings = [];
         $array_settings['cc'] = $this->fromStringEmailsToArray( $this->getOption("emails_cc") );
         $array_settings['temp_dir'] = sys_get_temp_dir();
-
+        
         $template_customer = new TemplateEmailGenPDF(intval($this->getOption('customer_email_template')));     
-        $array_settings['templates']['customer'] = $template_customer->getHtml();
+        $array_settings['templates']['customer'] =  $template_customer->getHtml();
         
         $template_admin = new TemplateEmailGenPDF(intval($this->getOption('admin_email_template')));      
         $array_settings['templates']['admin'] = $template_admin->getHtml();

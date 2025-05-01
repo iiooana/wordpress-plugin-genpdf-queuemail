@@ -40,14 +40,15 @@ function genpdf_getPath()
 {
     return  plugin_dir_path(__FILE__);
 }
-register_activation_hook(__FILE__, 'genpdf_active');
 
+register_activation_hook(__FILE__, 'genpdf_active');
 
 function genpdf_assets()
 {
     wp_enqueue_style('genpdf_css', plugin_dir_url(__FILE__) . "css/general.css", array(), '1.4');
 }
 add_action('admin_init', 'genpdf_assets');
+
 function genpdf_register_post_type()
 {
     if (is_admin()) {
@@ -79,19 +80,10 @@ function genpdf_register_post_type()
                 'menu_position' => 40,
                 "menu_icon" => "dashicons-email",
                 "supports" => ['title', 'editor','revisions','author'],
-                'capabilities' => [
-                    'edit_post'           => 'edit_genpdf_template',
-                    'read_post'           => 'read_genpdf_template',
-                    'delete_post'         => 'delete_genpdf_template',
-                    'edit_posts'          => 'edit_genpdf_templates',
-                    'edit_others_posts'   => 'edit_others_genpdf_templates',
-                    'read_private_posts'  => 'read_private_genpdf_templates',
-                ],
             ]
         );
     }
 }
-
 add_action('init', 'genpdf_register_post_type');
 
 add_filter('pre_trash_post', 'genpdf_prevent_delete_template', 10, 2);
@@ -105,8 +97,8 @@ function genpdf_prevent_delete_template($trash, $post) {
     }
     return $trash;
 }
-add_action('admin_notices', 'genpdf_alerts');
 
+add_action('admin_notices', 'genpdf_alerts');
 function genpdf_alerts() {
     if (isset($_GET['genpdf_error_delete_template'])) { ?>
          <div class="notice notice-error is-dismissible"><p>You can't trash the template beacuse it is used, to change go into <em>GenPDF settings</em>.</p></div>
@@ -122,7 +114,7 @@ add_action('plugins_loaded', function () {
     new \GenPDF\AdminGenPDF();
 });
 
-add_action('woocommerce_checkout_update_order_meta', 'genpdf_add_extra_order_meta', 10, 1);
+
 /**
  * @param $order_id
  * Save on DB meta data that are needed to PDF generation.
@@ -206,8 +198,7 @@ function genpdf_add_extra_order_meta($order_id)
                             }
                         }
                     }
-                    //endregion
-                    //endregion                
+                    //endregion               
 
                     //region insert to db
                     $wpdb->insert(
@@ -226,9 +217,7 @@ function genpdf_add_extra_order_meta($order_id)
     }
     //endregion
 }
-
-add_filter('woocommerce_admin_order_actions', 'genpdf_buttons_orders', 100, 2);
-
+add_action('woocommerce_checkout_update_order_meta', 'genpdf_add_extra_order_meta', 10, 1);
 /**
  * @return html of buttons for download pdf
  */
@@ -243,7 +232,7 @@ function genpdf_buttons_orders($actions, $order)
             foreach ($products as $item) {
                 if (!empty($item['meta_value']) && json_validate($item['meta_value'])) {
                     $product = json_decode($item['meta_value'], ARRAY_A);
-                    //genpdf_vardie($product);
+                    
                     if (!empty($product['titolo_corso_pdf']) && !empty($product['product_id'])) {
                         $actions[] = [
                             'url'    => admin_url('admin.php?page=genpdf_download_pdf&order_id=' . $order->id . "&product_id=" . $product['product_id']),
@@ -267,13 +256,14 @@ function genpdf_buttons_orders($actions, $order)
     }
     return $actions;
 }
+add_filter('woocommerce_admin_order_actions', 'genpdf_buttons_orders', 100, 2);
+
 /**
  * Add a plugin page.
  */
 function genpdf_add_pages()
 {
     //region page to download pdf
-    //todo remove from options menu....
     add_submenu_page(null,
         __('Download PDF', 'genpdf-woocommerce'),
         __('Download PDF', 'genpdf-woocommerce'),
@@ -292,13 +282,6 @@ function genpdf_add_pages()
         'genpdf_send_attachments',
     );
     //endregion
-    add_submenu_page(null,
-        __('Send genpdf_cron', 'genpdf-woocommerce'),
-        __('Send genpdf_cron', 'genpdf-woocommerce'),
-        'manage_options',
-        'genpdf_cron',
-        'genpdf_cron',
-    );
 
 }
 add_action('admin_menu', 'genpdf_add_pages');
@@ -373,9 +356,4 @@ function genpdf_send_attachments()
             echo "<h1>A breve verrà inviata la mail.</h1><a class='button' href=".$_SERVER['HTTP_REFERER'].">Torna indietro</a>";
         }
     }
-}
-
-//TODO REMOVE
-function genpdf_cron(){
-    do_action('genpdf_cron');
 }

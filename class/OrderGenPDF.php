@@ -158,9 +158,7 @@ class OrderGenPDF
                     if (intval($product['product_id']) == $product_id) {
                         //region tabella extra
                         $order_data['tabella_extra'] = self::getHTMLTabellaExtra($product);
-                        //genpdf_vardie($order_data);
                         //endregion
-                        //genpdf_vardie($product);
                         $order_data['titolo_corso_pdf'] = $product['titolo_corso_pdf'];
                         $order_data['giorno_generico_settimana'] = $product['giorno_generico_settimana'];
                         $order_data['anno_accademico'] = $product['anno_accademico'];
@@ -254,7 +252,6 @@ class OrderGenPDF
         if (!empty($row) && !empty($row['ID'])) {
             $meta = get_post_meta($row['ID'], '_wp_attached_file');
             $genpdf_folder = apply_filters('genpdf_get_signature_folder', '');
-            //genpdf_vardie($genpdf_folder['basedir'].$meta[0]);
             if (!empty($meta[0]) && file_exists($genpdf_folder['basedir'] . $meta[0])) {
                 return base64_encode(file_get_contents($genpdf_folder['basedir'] . $meta[0]));
             }
