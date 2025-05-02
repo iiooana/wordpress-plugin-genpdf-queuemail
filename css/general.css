@@ -1,27 +1,36 @@
-.genpdf_btn_download{
+.widefat .column-wc_actions a.button.genpdf_btn_download{
     background-color: #67AE6E !important;
     color: #FFFFFF !important;
-    font-weight: bold !important;
     padding: 2px 4px !important;
     width: unset !important;
-    max-width: 100px !important; 
+    max-width: 150px !important; 
+    font-weight: bold !important;
     border: none !important;
+    padding: 0.5em 1em !important; 
+    font-size: 10px !important;
+    line-height: 1.5 !important;
+    height: auto !important;
+    text-align: center !important;
+    text-indent: 0 !important;
+    overflow: visible !important;
+    white-space: normal !important;
 }
-.genpdf_btn_download::after{
-    content: "Download PDF";
-}
-.genpdf_btn_send_attachments{
+.widefat .column-wc_actions a.button.genpdf_btn_send_attachments{
     background-color: #00879E !important;
     color: #FFFFFF !important;
-    font-weight: bold !important;
     padding: 2px 4px !important;
     width: unset !important;
-    max-width: 100px !important; 
+    max-width: 150px !important; 
+    font-weight: bold !important;
     border: none !important;
-}
-.genpdf_btn_send_attachments::after{
-    content: "Invia allegati al cliente";
-}
+    padding: 0.5em 1em !important; 
+    font-size: 10px !important;
+    line-height: 1.5 !important;
+    height: auto !important;
+    text-align: center !important;
+    text-indent: 0 !important;
+    overflow: visible !important;
+    white-space: normal !important;
 #genpdf_table > tbody > tr > td  input{
     width: 100% ;
 }

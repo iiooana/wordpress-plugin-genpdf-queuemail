@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Generate PDF
  * Description: Generate a PDF compiled of the order's data. View the history data of the "Contact Form Entries" plugin. 
- * Version: 0.4.0
+ * Version: 0.4.1
  * Author: Ioana
  * Text Domain: genpdf-woocommerce
  * Domain Path: /languages
@@ -232,11 +232,14 @@ function genpdf_buttons_orders($actions, $order)
             foreach ($products as $item) {
                 if (!empty($item['meta_value']) && json_validate($item['meta_value'])) {
                     $product = json_decode($item['meta_value'], ARRAY_A);
-                    
+                    $titolo_del_corso = $product['titolo_corso_pdf'];
+                    if(strlen($titolo_del_corso) > 17){
+                        $titolo_del_corso = substr($titolo_del_corso,0,17)."...";
+                    }
                     if (!empty($product['titolo_corso_pdf']) && !empty($product['product_id'])) {
                         $actions[] = [
                             'url'    => admin_url('admin.php?page=genpdf_download_pdf&order_id=' . $order->id . "&product_id=" . $product['product_id']),
-                            'name'   => 'Download PDF ' . $product['titolo_corso_pdf'],
+                            'name'   => 'Download PDF ' . $titolo_del_corso,
                             'action' => 'genpdf_btn_download'
                         ];
                     }
@@ -351,9 +354,10 @@ function genpdf_send_attachments()
             )
         );
         if ($is_updated === false) {
-            echo "<h1>Si è verificato un'errore, contattare l'assistenza</h1>";
+            printf("<h1>Si è verificato un'errore, contattare l'assistenza</h1>");
         } else {
-            echo "<h1>A breve verrà inviata la mail.</h1><a class='button' href=".$_SERVER['HTTP_REFERER'].">Torna indietro</a>";
+            printf("<h1>A breve verrà inviata la mail.</h1><a class='button' href='%s'>Torna indietro</a>",$_SERVER['HTTP_REFERER']);
+            
         }
     }
 }
