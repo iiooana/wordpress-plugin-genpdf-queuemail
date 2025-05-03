@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Generate PDF plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Generate PDF 0.2.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/genpdf-woocommerce\n"
+"Project-Id-Version: Generate PDF 0.4.2\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wordpress-plugin-genpdf-queuemail-master\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-04-15T21:23:02+00:00\n"
+"POT-Creation-Date: 2025-05-03T13:19:49+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: genpdf-woocommerce\n"
@@ -21,7 +21,7 @@ msgstr ""
 
 #. Description of the plugin
 #: index.php
-msgid "Generate PDF from orders and send emails in a queue. This plugin is customized to be compatible with \"Contact Form Entries\"."
+msgid "Generete PDF from customer data and product data. Manage the queue of emails with attachments."
 msgstr ""
 
 #. Author of the plugin
@@ -29,49 +29,123 @@ msgstr ""
 msgid "Ioana"
 msgstr ""
 
-#: class/AdminGenPDF.php:23
-msgid "Subscriptions from old website"
+#: class/AdminGenPDF.php:27
+#: class/AdminGenPDF.php:28
+#: index.php:75
+#: views/settings_page.php:6
+msgid "GenPDF settings"
 msgstr ""
 
-#: class/AdminGenPDF.php:24
-msgid "Subs. old website"
+#: class/AdminGenPDF.php:38
+msgid "GenPDF Templates"
 msgstr ""
 
-#: views/old_subscritions.php:15
+#: class/AdminGenPDF.php:39
+msgid "Templates"
+msgstr ""
+
+#: class/AdminGenPDF.php:47
+#: class/AdminGenPDF.php:48
+msgid "Add new template"
+msgstr ""
+
+#: class/AdminGenPDF.php:58
+#: class/AdminGenPDF.php:59
+msgid "Download PDF"
+msgstr ""
+
+#: class/AdminGenPDF.php:66
+#: class/AdminGenPDF.php:67
+msgid "Send attachments"
+msgstr ""
+
+#: class/AdminGenPDF.php:79
+msgid "GenPDF Template Email"
+msgstr ""
+
+#: class/AdminGenPDF.php:94
+msgid "Template email used by GenPDF plugin"
+msgstr ""
+
+#: index.php:75
+msgid "You can't trash the template beacuse it is used, to change go into"
+msgstr ""
+
+#: index.php:223
+msgid "Sent attacchments to customer"
+msgstr ""
+
+#: index.php:278
+msgid "An error occurs, contact the support"
+msgstr ""
+
+#: index.php:280
+msgid "In a few minutes, the email will be sent"
+msgstr ""
+
+#: index.php:280
+msgid "Go back"
+msgstr ""
+
+#: views/old_subscritions.php:3
 msgid "Subscriptions received from the old website"
 msgstr ""
 
-#: views/old_subscritions.php:34
+#: views/old_subscritions.php:22
 msgid "date"
 msgstr ""
 
-#: views/old_subscritions.php:81
+#: views/old_subscritions.php:69
 msgid "search"
 msgstr ""
 
-#: views/old_subscritions.php:84
+#: views/old_subscritions.php:72
 msgid "items"
 msgstr ""
 
-#: views/old_subscritions.php:92
+#: views/old_subscritions.php:80
 msgid "of"
 msgstr ""
 
-#: views/old_subscritions.php:109
-#: views/old_subscritions.php:132
+#: views/old_subscritions.php:97
+#: views/old_subscritions.php:120
 msgid "First name"
 msgstr ""
 
-#: views/old_subscritions.php:110
-#: views/old_subscritions.php:133
+#: views/old_subscritions.php:98
+#: views/old_subscritions.php:121
 msgid "Last name"
 msgstr ""
 
-#: views/old_subscritions.php:112
-#: views/old_subscritions.php:135
+#: views/old_subscritions.php:100
+#: views/old_subscritions.php:123
 msgid "Date"
 msgstr ""
 
-#: views/old_subscritions.php:121
+#: views/old_subscritions.php:109
 msgid "View"
+msgstr ""
+
+#: views/settings_page.php:12
+msgid "Set the link of the logo to insert into the pdf"
+msgstr ""
+
+#: views/settings_page.php:22
+msgid "List of emails separated by \",\""
+msgstr ""
+
+#: views/settings_page.php:23
+msgid "Add one or more to receive the email order with attachments."
+msgstr ""
+
+#: views/settings_page.php:31
+msgid "Template email customer"
+msgstr ""
+
+#: views/settings_page.php:47
+msgid "Template email admin"
+msgstr ""
+
+#: views/settings_page.php:63
+msgid "Save"
 msgstr ""

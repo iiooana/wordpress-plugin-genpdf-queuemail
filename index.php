@@ -72,7 +72,7 @@ function genpdf_prevent_delete_template($trash, $post) {
 add_action('admin_notices', 'genpdf_alerts');
 function genpdf_alerts() {
     if (isset($_GET['genpdf_error_delete_template'])) { ?>
-         <div class="notice notice-error is-dismissible"><p>You can't trash the template beacuse it is used, to change go into <em>GenPDF settings</em>.</p></div>
+         <div class="notice notice-error is-dismissible"><p><?=__("You can't trash the template beacuse it is used, to change go into","genpdf-woocommerce")?> <em> <?=__('GenPDF settings', 'genpdf-woocommerce')?> </em>.</p></div>
     <? }
 }
 
@@ -220,7 +220,7 @@ function genpdf_buttons_orders($actions, $order)
             if (!empty($order->status) && in_array($order->status, $array_status)) {
                 $actions[] = [
                     "url" => admin_url('admin.php?page=genpdf_send_attachments&order_id=' . $order->id),
-                    "name" => "Invia allegati al cliente",
+                    "name" => __("Sent attacchments to customer","genpdf-woocommerce"),
                     "action" => "genpdf_btn_send_attachments"
                 ];
             }
@@ -275,9 +275,9 @@ function genpdf_send_attachments()
         $add_info = ['message' => "Aggiunto alla coda manualmente dal id_utente_wp = " . get_current_user_id() ];
         $is_updated = OrderEmailGenPDF::addEmailQueueUser(intval($_REQUEST['order_id']),$add_info);
         if ($is_updated === false) {
-            printf("<h1>Si è verificato un'errore, contattare l'assistenza</h1>");
+            printf("<h1>%s.</h1>",__("An error occurs, contact the support","genpdf-woocommerce"));
         } else {
-            printf("<h1>A breve verrà inviata la mail.</h1><a class='button' href='%s'>Torna indietro</a>",$_SERVER['HTTP_REFERER']);
+            printf("<h1>%s.</h1><a class='button' href='%s'>%s</a>",__("In a few minutes, the email will be sent","genpdf-woocommerce"),$_SERVER['HTTP_REFERER'],__("Go back","genpdf-woocommerce"));
             
         }
     }
@@ -288,7 +288,7 @@ function genpdf_send_attachments()
  */
 function genpdf_add_queue_email($order_id,$status_from,$status_to){
     if(is_admin() && !empty($_REQUEST['action']) && in_array($_REQUEST['action'],['edit_order','woocommerce_mark_order_status']) && $status_to == 'completed'){
-        $add_info = ['message' => "Email aggiunta alla coda, id_utente_wp = " . get_current_user_id()." ha cambiato lo stato ordine in = ".$status_to ];
+        $add_info = ['message' => "Email added at the queue, id_user_wp = " . get_current_user_id()." has changed the order status = ".$status_to ];
         OrderEmailGenPDF::addEmailQueueUser($order_id,$add_info);
     }
 }

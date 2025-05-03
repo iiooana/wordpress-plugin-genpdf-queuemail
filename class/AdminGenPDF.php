@@ -18,7 +18,7 @@ class AdminGenPDF
 
     public function icon()
     {
-        return 'dashicons-id-alt';
+        return 'dashicons-pdf';
     }
     public function addMenu()
     {

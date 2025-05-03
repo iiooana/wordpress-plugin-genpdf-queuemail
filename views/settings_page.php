@@ -9,7 +9,7 @@ if (!is_admin()) {
         <table class="form-table indent-children" role="presentation" width="100%" id="genpdf_table">
             <tbody>
                 <tr>
-                    <td><strong>Logo - Set the link of the logo to insert into the pdf</strong></td>
+                    <td><strong>Logo - <?=__('Set the link of the logo to insert into the pdf','genpdf-woocommerce')?></strong></td>
                     <td>
                         <div style="max-height: 200px; max-width: 400px;">
                             <?= $genpdf->getLogo() ?>
@@ -19,8 +19,8 @@ if (!is_admin()) {
                 </tr>
                 <tr>
                     <td>
-                        <p><strong>List of emails separated by ","</strong></p>
-                        <p>Add one or more to receive the email order with attachments.</p>
+                        <p><strong><?=__('List of emails separated by ","','genpdf-woocommerce') ?></strong></p>
+                        <p><?=__('Add one or more to receive the email order with attachments.','genpdf-woocommerce')?></p>
                     </td>
                     <td>
                         <input type="text" name="admin_emails" value="<?= $genpdf->getOption('emails_cc') ?>" requiredd>
@@ -28,7 +28,7 @@ if (!is_admin()) {
                 </tr>
                 <tr>
                     <td>
-                        <p><strong>Template email customer</strong></p>
+                        <p><strong><?=__('Template email customer','genpdf-woocommerce')?></strong></p>
                     </td>
                     <td>
                         <? $template_id =$genpdf->getOption('customer_email_template');?>
@@ -44,7 +44,7 @@ if (!is_admin()) {
                 </tr>
                 <tr>
                     <td>
-                        <p><strong>Template email admin</strong></p>
+                        <p><strong><?=__('Template email admin','genpdf-woocommerce')?></strong></p>
                     </td>
                     <td>
                     <? $template_id =$genpdf->getOption('admin_email_template');?>
