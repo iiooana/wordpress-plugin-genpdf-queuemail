@@ -30,7 +30,8 @@
     text-align: center !important;
     text-indent: 0 !important;
     overflow: visible !important;
-    white-space: normal !important;
+    white-space: normal !important; 
+}
 #genpdf_table > tbody > tr > td  input{
     width: 100% ;
 }

@@ -55,7 +55,7 @@ add_action('genpdf_cron', function () {
 					//region add CC
 					if(!empty($array_settings['cc']) && is_array($array_settings['cc'])){
 						foreach($array_settings['cc'] as $email){
-							$headers[] = "cc: $email <$email>";
+							$headers[] = "bcc: $email <$email>";
 						}
 					}
 					//endregion
@@ -91,7 +91,7 @@ add_action('genpdf_cron', function () {
 							if(!empty($array_settings['cc']) && is_array($array_settings['cc'])){
 								foreach($array_settings['cc'] as $j => $email){
 									if($j > 0){
-										$headers[] = "cc: $email <$email>";
+										$headers[] = "bcc: $email <$email>";
 									}
 								}
 							}

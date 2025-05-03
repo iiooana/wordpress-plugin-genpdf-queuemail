@@ -4,7 +4,7 @@ if (!is_admin()) {
 } ?>
 <div class="wrap">
     <h1 class="wp-heading-inline"><?= __('GenPDF settings', 'genpdf-woocommerce') ?></h1>
-    <form action="?page=genpdf_settings" method="post">
+    <form action="?page=genpdf_menu" method="post">
         <? wp_nonce_field('genpdf_settings', 'genpdf_settings_value') ?>
         <table class="form-table indent-children" role="presentation" width="100%" id="genpdf_table">
             <tbody>

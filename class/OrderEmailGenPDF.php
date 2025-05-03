@@ -136,4 +136,39 @@ class OrderEmailGenPDF
     public static function getListAcceptsStatus(){
         return ['wc-processing','processing','wc-completed','completed'];
     }
+
+    /**
+     * Add queue email for order from wp_user
+     * @return bool if the data is updated
+     */
+    public static function addEmailQueueUser(int $order_id, array $add_info ){
+        global $wpdb;
+        $table = OrderEmailGenPDF::getTableName();
+        $query = $wpdb->prepare("SELECT * FROM {$table} where order_id= %d", [$order_id]);
+        $row = $wpdb->get_row($query, ARRAY_A);
+        $info = json_decode($row['info'], true);
+        $date_time = date('Y-m-d H:i:s', current_time('timestamp'));
+        $info[$date_time] = $add_info;
+       return $wpdb->update(
+            $table,
+            array(
+                'remaining_attemps' => 1,
+                'info' => json_encode($info),
+                'next_time' => date('Y-m-d H:i:s', intval(current_time('timestamp')) + 120),
+                'updated_at' => $date_time,
+            ),
+            array(
+                'order_id' => $row['order_id'],
+            ),
+            array(
+                '%d',
+                '%s',
+                '%s',
+                '%s',
+            ),
+            array(
+                '%d',
+            )
+        );
+    }
 }

@@ -1,20 +1,14 @@
 <?php
 /*
  * Plugin Name: Generate PDF
- * Description: Generate a PDF compiled of the order's data. View the history data of the "Contact Form Entries" plugin. 
- * Version: 0.4.1
+ * Description: Generete PDF from customer data and product data. Manage the queue of emails with attachments.
+ * Version: 0.4.2
  * Author: Ioana
  * Text Domain: genpdf-woocommerce
  * Domain Path: /languages
  * Requires PHP: 8.3
  * Requires at least: 6.0 
  */
-
-use GenPDF\GenPDF;
-use GenPDF\OrderGenPDF;
-use Dompdf\Dompdf;
-use Dompdf\Options;
-use GenPDF\OrderEmailGenPDF;
 
 
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -29,6 +23,13 @@ require_once plugin_dir_path(__FILE__) . 'class/TemplateGenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'class/OrderGenPDF.php';
 require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
 require_once plugin_dir_path(__FILE__) . 'cron.php';
+
+use GenPDF\GenPDF;
+use GenPDF\OrderGenPDF;
+use GenPDF\AdminGenPDF;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use GenPDF\OrderEmailGenPDF;
 
 function genpdf_vardie()
 {
@@ -45,46 +46,16 @@ register_activation_hook(__FILE__, 'genpdf_active');
 
 function genpdf_assets()
 {
-    wp_enqueue_style('genpdf_css', plugin_dir_url(__FILE__) . "css/general.css", array(), '1.4');
+    wp_enqueue_style('genpdf_css', plugin_dir_url(__FILE__) . "css/general.css", array(), '1.5');
 }
 add_action('admin_init', 'genpdf_assets');
 
 function genpdf_register_post_type()
 {
-    if (is_admin()) {
-        register_post_type(
-            'genpdf_template',
-            [
-                "label" => __('GenPDF Template Email', 'genpdf-woocommerce'),
-                'labels' => [
-                    'name' => __('GenPDF Templates'),
-                    'singular_name' => __('GenPDF Template Email'),
-                    'add_new' => __('Add Template Email'),
-                    'add_new_item' => __('Add New Template'),
-                    'edit' => __('Edit Template'),
-                    'edit_item' => __('Edit Template'),
-                    'new_item' => __('Add New Template'),
-                    'view' => __('View Template'),
-                    'view_item' => __('View Template'),
-                    'search_items' => __('Search Template'),
-                    'not_found' => __('No Template Found'),
-                    'not_found_in_trash' => __('No Template found in Trash'),
-                ],
-                "description" => __("Template email used by GenPDF plugin", "genpdf-woocommerce"),
-                "exclude_from_search" => true,
-                "publicly_queryable" => false,
-                "show_ui" => true,
-                "show_in_menu" => true,
-                "public" => true,
-                "show_in_rest" => false,
-                'menu_position' => 40,
-                "menu_icon" => "dashicons-email",
-                "supports" => ['title', 'editor','revisions','author'],
-            ]
-        );
-    }
+    AdminGenPDF::register_post_type();
 }
 add_action('init', 'genpdf_register_post_type');
+
 
 add_filter('pre_trash_post', 'genpdf_prevent_delete_template', 10, 2);
 function genpdf_prevent_delete_template($trash, $post) {
@@ -261,33 +232,6 @@ function genpdf_buttons_orders($actions, $order)
 }
 add_filter('woocommerce_admin_order_actions', 'genpdf_buttons_orders', 100, 2);
 
-/**
- * Add a plugin page.
- */
-function genpdf_add_pages()
-{
-    //region page to download pdf
-    add_submenu_page(null,
-        __('Download PDF', 'genpdf-woocommerce'),
-        __('Download PDF', 'genpdf-woocommerce'),
-        'manage_options',
-        'genpdf_download_pdf',
-        'genpdf_download_pdf'
-    );
-    //endregion
-
-    //region to add sendemail
-    add_submenu_page(null,
-        __('Send attachments', 'genpdf-woocommerce'),
-        __('Send attachments', 'genpdf-woocommerce'),
-        'manage_options',
-        'genpdf_send_attachments',
-        'genpdf_send_attachments',
-    );
-    //endregion
-
-}
-add_action('admin_menu', 'genpdf_add_pages');
 function genpdf_download_pdf()
 {
     if (
@@ -319,40 +263,17 @@ function genpdf_download_pdf()
         fclose($temp_file); //close and delete
     }
 }
+/**
+ * Create new email to queue for order manually by user
+ */
 function genpdf_send_attachments()
 {
     if (
         is_admin() && !empty($_REQUEST['page']) && $_REQUEST['page'] == 'genpdf_send_attachments'
         && !empty($_REQUEST['order_id']) && is_numeric($_REQUEST['order_id'])
     ) {
-        global $wpdb;
-        $table = OrderEmailGenPDF::getTableName();
-        $query = $wpdb->prepare("SELECT * FROM {$table} where order_id= %d", [$_REQUEST['order_id']]);
-        $row = $wpdb->get_row($query, ARRAY_A);
-        $info = json_decode($row['info'], true);
-        $date_time = date('Y-m-d H:i:s', current_time('timestamp'));
-        $info[$date_time] = ['message' => "Aggiunto alla coda dal id_utente_wp = " . get_current_user_id()];
-        $is_updated = $wpdb->update(
-            $table,
-            array(
-                'remaining_attemps' => 1,
-                'info' => json_encode($info),
-                'next_time' => date('Y-m-d H:i:s', intval(current_time('timestamp')) + 120),
-                'updated_at' => $date_time,
-            ),
-            array(
-                'order_id' => $row['order_id'],
-            ),
-            array(
-                '%d',
-                '%s',
-                '%s',
-                '%s',
-            ),
-            array(
-                '%d',
-            )
-        );
+        $add_info = ['message' => "Aggiunto alla coda manualmente dal id_utente_wp = " . get_current_user_id() ];
+        $is_updated = OrderEmailGenPDF::addEmailQueueUser(intval($_REQUEST['order_id']),$add_info);
         if ($is_updated === false) {
             printf("<h1>Si è verificato un'errore, contattare l'assistenza</h1>");
         } else {
@@ -361,3 +282,14 @@ function genpdf_send_attachments()
         }
     }
 }
+
+/**
+ * Create new email to queue for order manually by user
+ */
+function genpdf_add_queue_email($order_id,$status_from,$status_to){
+    if(is_admin() && !empty($_REQUEST['action']) && in_array($_REQUEST['action'],['edit_order','woocommerce_mark_order_status']) && $status_to == 'completed'){
+        $add_info = ['message' => "Email aggiunta alla coda, id_utente_wp = " . get_current_user_id()." ha cambiato lo stato ordine in = ".$status_to ];
+        OrderEmailGenPDF::addEmailQueueUser($order_id,$add_info);
+    }
+}
+add_action("woocommerce_order_status_changed","genpdf_add_queue_email",40,3);
