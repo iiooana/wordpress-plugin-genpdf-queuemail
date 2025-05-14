@@ -54,10 +54,8 @@ function genpdf_active(){
 
   //region create folder for signature
   $dir_path = get_home_path()."wp-content/signatures";
-  if(is_dir($dir_path) === false){
-    if( mkdir($dir_path) === false) {
-        error_log("The plugin wordpress-plugin-genpdf cannot create the folder wp-content/signatures. [genpdf001]");
-    }
+  if(is_dir($dir_path) === false || mkdir($dir_path) === false){
+      error_log("The plugin wordpress-plugin-genpdf cannot create the folder wp-content/signatures. [genpdf001]");
     
   } 
   //endregion

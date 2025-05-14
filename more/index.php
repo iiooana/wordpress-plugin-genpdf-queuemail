@@ -31,7 +31,7 @@ function DSCFW_save_image( $base64_img, $title ) {
 	);
 
 	$attach_id = wp_insert_attachment( $attachment,$genpdf_ok === false ? $upload_dir['path'] : $upload_dir['subdir'] . '/' . $hashed_filename );
-	require_once( ABSPATH . 'wp-admin/includes/image.php' );
+	require_once ABSPATH . 'wp-admin/includes/image.php' ;
 	// $attach_data = wp_generate_attachment_metadata( $attach_id, $hashed_filename );
 	// wp_update_attachment_metadata( $attach_id, $attach_data );
 return $attach_id;

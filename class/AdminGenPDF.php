@@ -113,7 +113,7 @@ class AdminGenPDF
     {
         if (is_admin()) {
             $subs = new OldSubGenPDF();
-            include_once(genpdf_getPath() . '/views/old_subscritions.php');
+            include_once genpdf_getPath() . '/views/old_subscritions.php';
         }
     }
 
@@ -128,12 +128,12 @@ class AdminGenPDF
                 if (wp_verify_nonce($_REQUEST['genpdf_settings_value'], 'genpdf_settings') === false) {
                     wp_die("Your token nonce is not valid");
                 }
-                if (isset($_REQUEST['logo']) && !empty($_REQUEST['logo'])) {
-                    $genpdf->updateOption("logo", $_REQUEST['logo']);
+                if (isset($_POST['logo']) && !empty($_POST['logo'])) {
+                    $genpdf->updateOption("logo", $_POST['logo']);
                 }
-                if (isset($_REQUEST['admin_emails']) && !empty($_REQUEST['admin_emails'])) {
+                if (isset($_POST['admin_emails']) && !empty($_POST['admin_emails'])) {
                     $is_valid = true;
-                    $array_email = $genpdf->fromStringEmailsToArray($_REQUEST['admin_emails']);
+                    $array_email = $genpdf->fromStringEmailsToArray($_POST['admin_emails']);
                     foreach ($array_email as $item) {
                         if (filter_var($item, FILTER_VALIDATE_EMAIL) === FALSE) {
                             $is_valid = false; ?>
@@ -143,19 +143,19 @@ class AdminGenPDF
 <? }
                     }
                     if ($is_valid === true) {
-                        $genpdf->updateOption('emails_cc', $_REQUEST['admin_emails']) === false;
+                        $genpdf->updateOption('emails_cc', $_POST['admin_emails']) === false;
                     }
                 }
-                if (isset($_REQUEST['customer_email_template']) && !empty($_REQUEST['customer_email_template'])) {
-                    $genpdf->updateOption("customer_email_template", $_REQUEST['customer_email_template']);
+                if (isset($_POST['customer_email_template']) && !empty($_POST['customer_email_template'])) {
+                    $genpdf->updateOption("customer_email_template", $_POST['customer_email_template']);
                 }
-                if (isset($_REQUEST['admin_email_template']) && !empty($_REQUEST['admin_email_template'])) {
-                    $genpdf->updateOption("admin_email_template", $_REQUEST['admin_email_template']);
+                if (isset($_POST['admin_email_template']) && !empty($_POST['admin_email_template'])) {
+                    $genpdf->updateOption("admin_email_template", $_POST['admin_email_template']);
                 }
             }
 
             $list_template = TemplateEmailGenPDF::getList();
-            include_once(genpdf_getPath() . '/views/settings_page.php');
+            include_once genpdf_getPath() . '/views/settings_page.php';
         }
     }
 }

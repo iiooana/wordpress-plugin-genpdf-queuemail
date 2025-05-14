@@ -5,13 +5,6 @@ namespace GenPDF;
 class OrderEmailGenPDF
 {
 
-    private $order_id;
-    private $next_time;
-    private $remaining_attemps;
-    private $info;
-    private $created_at;
-    private $updated_at;
-
     /**
      * Add the order on queue email
      */

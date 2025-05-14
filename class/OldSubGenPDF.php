@@ -33,7 +33,6 @@ class OldSubGenPDF {
         );
         if( !empty($this->search) ){
             $like = "%".$this->db->esc_like($this->search)."%";
-            //var_dump($this->search, $like);
             $query_prep = $this->db->prepare(
                 "SELECT count(DISTINCT(leads.id )) as n FROM {$this->db->base_prefix}vxcf_leads as leads
                 INNER JOIN {$this->db->base_prefix}vxcf_leads_detail as ld on ld.lead_id=leads.id and ld.value like %s
