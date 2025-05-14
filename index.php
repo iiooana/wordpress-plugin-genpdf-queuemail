@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Generate PDF
  * Description: Generete PDF from customer data and product data. Manage the queue of emails with attachments.
- * Version: 0.4.2
+ * Version: 0.4.3
  * Author: Ioana
  * Text Domain: genpdf-woocommerce
  * Domain Path: /languages
