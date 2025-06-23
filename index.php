@@ -114,7 +114,7 @@ function genpdf_add_extra_order_meta($order_id)
                     $array_product_metadata['giorno_generico_settimana'] = $product->attributes['pa_data'];
                 }
                 //endregion
-                //region acconto or totale
+                //region acconto, totale o altro...
                 if (!empty($product->attributes['pa_pagamento'])) {
                     $array_product_metadata['acconto_o_totale'] = $product->attributes['pa_pagamento'];
                 }

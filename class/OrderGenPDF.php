@@ -170,6 +170,7 @@ class OrderGenPDF
                             $order_data['checked_crediti'] = 'checked';
                         }
                         //endregion
+                        $order_data['condizioni_di_pagamento'] = self::getCondizioniDiPagamento($product['acconto_o_totale']) ?? '';
 
                         //region acconto or totale
                         if (!empty($product['acconto_o_totale']) && strpos($product['acconto_o_totale'], 'acconto') !== false) {
@@ -298,23 +299,22 @@ class OrderGenPDF
                 }
             }
         }
-      
-        if(empty($tmp['header']) || empty($tmp['body'])){
+
+        if (empty($tmp['header']) || empty($tmp['body'])) {
             return '';
         }
         return '<table style="margin-top:5px">
                 <thead>
                     <tr style="background-color: #1e87ac;font-size:14pt;">
-                        '.implode("",$tmp['header']).'
+                        ' . implode("", $tmp['header']) . '
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        '.implode("",$tmp['body']).'
+                        ' . implode("", $tmp['body']) . '
                     </tr>
                 </tbody>
             </table>';
-
     }
 
     /**
@@ -391,10 +391,10 @@ class OrderGenPDF
             foreach ($products as $product) {
                 if (!empty($product['meta_value']) && json_validate($product['meta_value'])) {
                     $product_json = json_decode($product['meta_value'], true);
-                   
+
                     ob_clean();
                     $dompdf = new Dompdf($options_dompdf);
-                   
+
                     $dompdf->loadHtml($this->getPDF($product_json['product_id']));
                     $dompdf->render();
                     $output = $dompdf->output();
@@ -434,5 +434,15 @@ class OrderGenPDF
         $table = $wpdb->base_prefix . "wc_order_addresses";
         $query = $wpdb->prepare("SELECT * from {$table} where order_id =  %d limit 1", [$this->order_id]);
         return $wpdb->get_row($query, ARRAY_A);
+    }
+
+    public function getCondizioniDiPagamento(String|null $string)
+    {
+        if (!empty($string)) {
+            $return = str_replace("-", " ", $string);
+            $return = strtoupper($return);
+            return $return;
+        }
+        return null;
     }
 }
