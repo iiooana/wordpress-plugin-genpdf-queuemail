@@ -208,11 +208,11 @@ function genpdf_buttons_orders($actions, $order)
             foreach ($products as $item) {
                 if (!empty($item['meta_value']) && json_validate($item['meta_value'])) {
                     $product = json_decode($item['meta_value'], ARRAY_A);
-                    $titolo_del_corso = $product['titolo_corso'];
+                    $titolo_del_corso = $product['titolo_corso_pdf'];
                     if (strlen($titolo_del_corso) > 10) {
                         $titolo_del_corso = substr($titolo_del_corso, 0, 10) . "...";
                     }
-                    if (!empty($product['titolo_corso']) && !empty($product['product_id'])) {
+                    if (!empty($product['titolo_corso_pdf']) && !empty($product['product_id'])) {
                         $actions[] = [
                             'url'    => admin_url('admin.php?page=genpdf_download_pdf&order_id=' . $order->id . "&product_id=" . $product['product_id']),
                             'name'   => '📥 ' . esc_attr($titolo_del_corso),
