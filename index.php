@@ -107,27 +107,30 @@ function genpdf_add_extra_order_meta($order_id)
         new OrderEmailGenPDF($order_id);
         //endregion
         foreach ($products as $item) {
-            $product = $item->get_product(); //this is a product variantion
+            $product = $item->get_product(); // This is a product variation
             if (!empty($product) && !empty($product->get_parent_id())) {
                 $array_product_metadata = [];
                 $array_product_metadata['product_id'] = $product->get_id();
                 $array_product_metadata['importo_totale'] = floatval($item->get_total()) + floatval($item->get_total_tax());
+
+                // Titolo del corso: solo il nome della variante
                 $array_product_metadata['titolo_corso'] = $product ? $product->get_name() : '';
+                error_log('Titolo corso (variante): ' . $array_product_metadata['titolo_corso']);
 
                 //region giorno_generico_settimana
-                if (!empty($product->attributes['pa_data'])) {
-                    $array_product_metadata['giorno_generico_settimana'] = $product->attributes['pa_data'];
-                }
+                $array_product_metadata['giorno_generico_settimana'] = $product->get_attribute('pa_data') ?: '';
+                error_log('Giorno generico settimana: ' . $array_product_metadata['giorno_generico_settimana']);
                 //endregion
+
                 //region acconto, totale o altro...
-                if (!empty($product->attributes['pa_pagamento'])) {
-                    $array_product_metadata['acconto_o_totale'] = $product->attributes['pa_pagamento'];
-                }
+                $array_product_metadata['acconto_o_totale'] = $product->get_attribute('pa_pagamento') ?: '';
+                error_log('Acconto o totale: ' . $array_product_metadata['acconto_o_totale']);
                 //endregion
 
                 $id_product = $product->get_parent_id();
                 if (!empty($id_product)) {
                     $array_product_metadata['parent_product_id'] = $id_product;
+
                     //region set the template
                     $template_id = $genpdf->getOption('template');
                     if (!empty($template_id)) {
@@ -146,11 +149,19 @@ function genpdf_add_extra_order_meta($order_id)
                     //endregion
 
                     //region product field
-                    $array_product_metadata['crediti_ecm'] = get_field('crediti_ecm', $id_product);
-                    $array_product_metadata['luogo_del_corso'] = get_field('luogoluoghi_corso', $id_product);
-                    $array_product_metadata['anno_accademico'] = get_field('anno_accademico', $id_product);
-                    $array_product_metadata['titolo_corso_pdf'] = get_field('titolo_corso_pdf', $id_product);
-                    $array_product_metadata['tabella_extra'] = get_field('tabella_extra', $id_product);
+                    $array_product_metadata['crediti_ecm'] = get_field('crediti_ecm', $id_product) ?: '';
+                    $array_product_metadata['luogo_del_corso'] = get_field('luogoluoghi_corso', $id_product) ?: '';
+                    $array_product_metadata['anno_accademico'] = get_field('anno_accademico', $id_product) ?: '';
+                    $array_product_metadata['titolo_corso_pdf'] = get_field('titolo_corso_pdf', $id_product) ?: '';
+                    $array_product_metadata['tabella_extra'] = get_field('tabella_extra', $id_product) ?: '';
+                    error_log('Campi ACF: ' . print_r([
+                        'crediti_ecm' => $array_product_metadata['crediti_ecm'],
+                        'titolo_corso_pdf' => $array_product_metadata['titolo_corso_pdf'],
+                        'luogo_del_corso' => $array_product_metadata['luogo_del_corso'],
+                        'anno_accademico' => $array_product_metadata['anno_accademico'],
+                        'tabella_extra' => $array_product_metadata['tabella_extra']
+                    ], true));
+                    //endregion
 
                     //region importi mensili
                     $tabella_importi_prodotto = get_field('tabella_importo_mese', $id_product);
@@ -159,7 +170,7 @@ function genpdf_add_extra_order_meta($order_id)
                             if (!empty($value) && floatval($value) > 0) {
                                 match ($key) {
                                     "importo_gennaio" => $array_product_metadata['importo_mese']['gennaio'] = $value,
-                                    "importo_febbrario" => $array_product_metadata['importo_mese']['febbraio'] = $value,
+                                    "importo_febbraio" => $array_product_metadata['importo_mese']['febbraio'] = $value,
                                     "importo_marzo" => $array_product_metadata['importo_mese']['marzo'] = $value,
                                     "importo_aprile" => $array_product_metadata['importo_mese']['aprile'] = $value,
                                     "importo_maggio" => $array_product_metadata['importo_mese']['maggio'] = $value,
@@ -174,7 +185,8 @@ function genpdf_add_extra_order_meta($order_id)
                             }
                         }
                     }
-                    //endregion               
+                    error_log('Importi mensili: ' . print_r($array_product_metadata['importo_mese'] ?? [], true));
+                    //endregion
 
                     //region insert to db
                     $wpdb->insert(
@@ -182,10 +194,11 @@ function genpdf_add_extra_order_meta($order_id)
                         [
                             "order_id" => $order_id,
                             "meta_key" => "product_detail",
-                            "meta_value" => json_encode($array_product_metadata)
+                            "meta_value" => json_encode($array_product_metadata, JSON_UNESCAPED_UNICODE)
                         ],
                         ['%d', '%s', '%s']
                     );
+                    error_log('Metadati salvati: ' . print_r($array_product_metadata, true));
                     //endregion
                 }
             }
@@ -216,7 +229,7 @@ function genpdf_buttons_orders($actions, $order)
                         $actions[] = [
                             'url'    => admin_url('admin.php?page=genpdf_download_pdf&order_id=' . $order->id . "&product_id=" . $product['product_id']),
                             'name'   => '📥 ' . esc_attr($titolo_del_corso),
-                            'title' => esc_attr($product['titolo_corso']),
+                            'title'  => esc_attr($product['titolo_corso'] ?: 'Download PDF'),
                             'action' => 'genpdf_btn_download'
                         ];
                     }
@@ -250,7 +263,7 @@ function genpdf_download_pdf()
         ob_clean();
         $product_id = $_REQUEST['product_id'];
         $order = new OrderGenPDF(intval($_REQUEST['order_id']));
-        $filename = "#" . $order->order_id . "_" . $product_id . "_modulo.pdf";
+        $filename = "#" . $order->order_id . "_" . $product_id . "_firmato.pdf";
 
         $options_dompdf = new Options();
         $options_dompdf->set('defaultFont', 'helvetica');
