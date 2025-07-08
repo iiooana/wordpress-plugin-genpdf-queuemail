@@ -229,7 +229,7 @@ function genpdf_buttons_orders($actions, $order)
                         $actions[] = [
                             'url'    => admin_url('admin.php?page=genpdf_download_pdf&order_id=' . $order->id . "&product_id=" . $product['product_id']),
                             'name'   => '📥 ' . esc_attr($titolo_del_corso),
-                            'title'  => esc_attr($product['titolo_corso'] ?: 'Download PDF'),
+                            'title'  => esc_attr($product['titolo_corso'] ?: $product['titolo_corso_pdf']),
                             'action' => 'genpdf_btn_download'
                         ];
                     }
