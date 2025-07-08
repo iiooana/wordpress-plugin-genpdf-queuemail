@@ -112,6 +112,7 @@ function genpdf_add_extra_order_meta($order_id)
                 $array_product_metadata = [];
                 $array_product_metadata['product_id'] = $product->get_id();
                 $array_product_metadata['importo_totale'] = floatval($item->get_total()) + floatval($item->get_total_tax());
+                $array_product_metadata['titolo_corso'] = $product ? $product->get_name() : '';
 
                 //region giorno_generico_settimana
                 if (!empty($product->attributes['pa_data'])) {
@@ -149,7 +150,6 @@ function genpdf_add_extra_order_meta($order_id)
                     $array_product_metadata['luogo_del_corso'] = get_field('luogoluoghi_corso', $id_product);
                     $array_product_metadata['anno_accademico'] = get_field('anno_accademico', $id_product);
                     $array_product_metadata['titolo_corso_pdf'] = get_field('titolo_corso_pdf', $id_product);
-                    $array_product_metadata['titolo_corso'] = get_the_title( $id_product );
                     $array_product_metadata['tabella_extra'] = get_field('tabella_extra', $id_product);
 
                     //region importi mensili
