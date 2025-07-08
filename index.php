@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Generate PDF
  * Description: Generete PDF from customer data and product data. Manage the queue of emails with attachments.
- * Version: 0.4.5
+ * Version: 0.4.4
  * Author: Ioana
  * Text Domain: genpdf-woocommerce
  * Domain Path: /languages
@@ -149,7 +149,6 @@ function genpdf_add_extra_order_meta($order_id)
                     $array_product_metadata['luogo_del_corso'] = get_field('luogoluoghi_corso', $id_product);
                     $array_product_metadata['anno_accademico'] = get_field('anno_accademico', $id_product);
                     $array_product_metadata['titolo_corso_pdf'] = get_field('titolo_corso_pdf', $id_product);
-                    $array_product_metadata['titolo_corso'] = get_the_title( $id_product );
                     $array_product_metadata['tabella_extra'] = get_field('tabella_extra', $id_product);
 
                     //region importi mensili
@@ -208,15 +207,15 @@ function genpdf_buttons_orders($actions, $order)
             foreach ($products as $item) {
                 if (!empty($item['meta_value']) && json_validate($item['meta_value'])) {
                     $product = json_decode($item['meta_value'], ARRAY_A);
-                    $titolo_del_corso = $product['titolo_corso'];
-                    if (strlen($titolo_del_corso) > 10) {
-                        $titolo_del_corso = substr($titolo_del_corso, 0, 10) . "...";
+                    $titolo_del_corso = $product['titolo_corso_pdf'];
+                    if (strlen($titolo_del_corso) > 17) {
+                        $titolo_del_corso = substr($titolo_del_corso, 0, 17) . "...";
                     }
-                    if (!empty($product['titolo_corso']) && !empty($product['product_id'])) {
+                    if (!empty($product['titolo_corso_pdf']) && !empty($product['product_id'])) {
                         $actions[] = [
                             'url'    => admin_url('admin.php?page=genpdf_download_pdf&order_id=' . $order->id . "&product_id=" . $product['product_id']),
-                            'name'   => '📥 ' . esc_attr($titolo_del_corso),
-                            'title' => esc_attr($product['titolo_corso']),
+                            'name'   => 'Download PDF ' . esc_attr($titolo_del_corso),
+                            'title' => esc_attr($product['titolo_corso_pdf']),
                             'action' => 'genpdf_btn_download'
                         ];
                     }
