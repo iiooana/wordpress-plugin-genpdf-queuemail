@@ -54,7 +54,7 @@ function DSCFW_product_get_data($post){
 	}
 	if (isset($_REQUEST['signpad']) && $signature_imgid !== false){
 		update_post_meta($post, 'signpad', $signature_imgid);
-		update_post_meta($signature_imgid, '_wp_attachment_image_alt', "Frima ordine #".$post);
+		update_post_meta($signature_imgid, '_wp_attachment_image_alt', "Firma ordine #".$post);
 	}
 }
 //disable signature on email
