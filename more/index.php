@@ -1,40 +1,32 @@
 <?php
 
-function DSCFW_save_image( $base64_img, $title ) {
+function DSCFW_save_image($base64_img, $title) {
+    // Decodifica l'immagine base64
+    $img = str_replace('data:image/png;base64,', '', $base64_img);
+    $img = str_replace(' ', '+', $img);
+    $decoded = base64_decode($img);
 
-	// Upload dir.
-	$upload_dir  = wp_upload_dir();
-	$genpdf_folder = apply_filters('genpdf_get_signature_folder','');
-	$genpdf_ok = false;
-	if( !empty($genpdf_folder['path']) && is_dir($genpdf_folder['path'])){
-		$upload_dir  = $genpdf_folder;
-		$genpdf_ok = true;
-	}
+    // Directory di upload
+    $upload_dir = wp_upload_dir();
+    $genpdf_folder = apply_filters('genpdf_get_signature_folder', '');
+    if (!empty($genpdf_folder['path']) && is_dir($genpdf_folder['path'])) {
+        $upload_dir = $genpdf_folder; // Usa wp-content/signatures/
+    }
 
-	$upload_path = str_replace( '/', DIRECTORY_SEPARATOR, $upload_dir['path'] ) . DIRECTORY_SEPARATOR;
+    $upload_path = str_replace('/', DIRECTORY_SEPARATOR, $upload_dir['path']) . DIRECTORY_SEPARATOR;
 
-	$img             = str_replace( 'data:image/png;base64,', '', $base64_img );
-	$img             = str_replace( ' ', '+', $img );
-	$decoded         = base64_decode( $img );
-	$filename        = $title.'.jpeg';
-	$file_type       = 'image/jpeg';
-	$hashed_filename = md5( $filename . microtime() ) . '_' . $filename;
+    // Nome file unico
+    $filename = $title . '.jpeg';
+    $hashed_filename = md5($filename . microtime()) . '_' . $filename;
 
-	// Save the image in the uploads directory.
-	$upload_file = file_put_contents( $upload_path . $hashed_filename, $decoded);
-	$attachment = array(
-		'post_mime_type' => $file_type,
-		'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $hashed_filename ) ),
-		'post_content'   => '',
-		'post_status'    => 'inherit',
-		'guid'           => $upload_dir['url'] . '/' . basename( $hashed_filename )
-	);
+    // Salva il file
+    $upload_file = file_put_contents($upload_path . $hashed_filename, $decoded);
+    if ($upload_file === false) {
+        return false; // Gestione errore
+    }
 
-	$attach_id = wp_insert_attachment( $attachment,$genpdf_ok === false ? $upload_dir['path'] : $upload_dir['subdir'] . '/' . $hashed_filename );
-	require_once ABSPATH . 'wp-admin/includes/image.php' ;
-	// $attach_data = wp_generate_attachment_metadata( $attach_id, $hashed_filename );
-	// wp_update_attachment_metadata( $attach_id, $attach_data );
-return $attach_id;
+    // Ritorna il percorso completo del file
+    return $upload_path . $hashed_filename;
 }
 //add_action( 'woocommerce_admin_order_data_after_billing_address', 'DSCFW_checkout_field_display_admin_order_meta', 10, 1 );	
 /*
@@ -43,19 +35,15 @@ if($signature_order_position == 'inside_order_detail'){
 }else{
 	add_action('woocommerce_order_details_after_customer_details', 'DSCFW_order_details');
 }*/
-function DSCFW_product_get_data($post){
-	// print_r($_REQUEST['signpad']);
-	// exit();       
-	$signature_imgid = false;
-	if (is_string($_REQUEST['signpad']) && strrpos($_REQUEST['signpad'], "data:image/png;base64", -strlen($_REQUEST['signpad'])) !== FALSE){
-
-		$signature_imgid = DSCFW_save_image(  $_REQUEST['signpad'],'fff' );
-                 
-	}
-	if (isset($_REQUEST['signpad']) && $signature_imgid !== false){
-		update_post_meta($post, 'signpad', $signature_imgid);
-		update_post_meta($signature_imgid, '_wp_attachment_image_alt', "Firma ordine #".$post);
-	}
+function DSCFW_product_get_data($post) {
+    $signature_filepath = false;
+    if (is_string($_REQUEST['signpad']) && strpos($_REQUEST['signpad'], "data:image/png;base64") === 0) {
+        $signature_filepath = DSCFW_save_image($_REQUEST['signpad'], 'fff');
+    }
+    if (isset($_REQUEST['signpad']) && $signature_filepath !== false) {
+        // Salva il percorso del file come metadato
+        update_post_meta($post, 'signpad', $signature_filepath);
+    }
 }
 //disable signature on email
 /* Display Signature Thankyou Page */
