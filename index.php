@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Generate PDF
  * Description: Generete PDF from customer data and product data. Manage the queue of emails with attachments.
- * Version: 0.4.5
+ * Version: 0.4.8
  * Author: Ioana
  * Text Domain: genpdf-woocommerce
  * Domain Path: /languages
@@ -149,19 +149,11 @@ function genpdf_add_extra_order_meta($order_id)
                     //endregion
 
                     //region product field
-                    $array_product_metadata['crediti_ecm'] = get_field('crediti_ecm', $id_product) ?: '';
-                    $array_product_metadata['luogo_del_corso'] = get_field('luogoluoghi_corso', $id_product) ?: '';
-                    $array_product_metadata['anno_accademico'] = get_field('anno_accademico', $id_product) ?: '';
-                    $array_product_metadata['titolo_corso_pdf'] = get_field('titolo_corso_pdf', $id_product) ?: '';
-                    $array_product_metadata['tabella_extra'] = get_field('tabella_extra', $id_product) ?: '';
-                    error_log('Campi ACF: ' . print_r([
-                        'crediti_ecm' => $array_product_metadata['crediti_ecm'],
-                        'titolo_corso_pdf' => $array_product_metadata['titolo_corso_pdf'],
-                        'luogo_del_corso' => $array_product_metadata['luogo_del_corso'],
-                        'anno_accademico' => $array_product_metadata['anno_accademico'],
-                        'tabella_extra' => $array_product_metadata['tabella_extra']
-                    ], true));
-                    //endregion
+                    $array_product_metadata['crediti_ecm'] = get_field('crediti_ecm', $id_product);
+                    $array_product_metadata['luogo_del_corso'] = get_field('luogoluoghi_corso', $id_product);
+                    $array_product_metadata['anno_accademico'] = get_field('anno_accademico', $id_product);
+                    $array_product_metadata['titolo_corso_pdf'] = get_field('titolo_corso_pdf', $id_product);
+                    $array_product_metadata['tabella_extra'] = get_field('tabella_extra', $id_product);
 
                     //region importi mensili
                     $tabella_importi_prodotto = get_field('tabella_importo_mese', $id_product);
@@ -223,13 +215,13 @@ function genpdf_buttons_orders($actions, $order)
                     $product = json_decode($item['meta_value'], ARRAY_A);
                     $titolo_del_corso = $product['titolo_corso_pdf'];
                     if (strlen($titolo_del_corso) > 10) {
-                        $titolo_del_corso = substr($titolo_del_corso, 0, 10) . "...";
+                        $titolo_del_corso = substr($titolo_del_corso, 0, 13) . "...";
                     }
                     if (!empty($product['titolo_corso_pdf']) && !empty($product['product_id'])) {
                         $actions[] = [
                             'url'    => admin_url('admin.php?page=genpdf_download_pdf&order_id=' . $order->id . "&product_id=" . $product['product_id']),
                             'name'   => '📥 ' . esc_attr($titolo_del_corso),
-                            'title'  => esc_attr($product['titolo_corso'] ?: $product['titolo_corso_pdf']),
+                            'title' => esc_attr($product['titolo_corso'] ?: $product['titolo_corso_pdf']),
                             'action' => 'genpdf_btn_download'
                         ];
                     }
