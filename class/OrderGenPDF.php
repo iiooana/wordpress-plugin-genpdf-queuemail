@@ -248,7 +248,8 @@ class OrderGenPDF
     private function getbase64Signature()
     {
         global $wpdb;
-        $query = $wpdb->prepare("SELECT ID FROM  wp_posts where ID = ( SELECT meta_value FROM `wp_postmeta` WHERE post_id=%d and meta_key=%s limit 1 ) AND post_type=%s limit 1 ", [$this->order_id, 'signpad', 'attachment']);
+        $query = $wpdb->prepare("SELECT ID FROM  ". $wpdb->base_prefix."posts where ID = 
+        ( SELECT meta_value FROM ". $wpdb->base_prefix."postmeta WHERE post_id=%d and meta_key=%s limit 1 ) AND post_type=%s limit 1 ", [$this->order_id, 'signpad', 'attachment']);
         $row = $wpdb->get_row($query, ARRAY_A);
         if (!empty($row) && !empty($row['ID'])) {
             $meta = get_post_meta($row['ID'], '_wp_attached_file');
