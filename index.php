@@ -139,7 +139,7 @@ function genpdf_add_extra_order_meta($order_id)
                             ['%d', '%d']
                         );
                     } else {
-                        $message = var_export(['message' => 'Errore non trovo il template per product_id.', 'product_id' => $id_product], true);
+                        $message = var_export(['message' => 'Errore non trovo il template impostato.', 'product_id' => $id_product, 'order_id' => $order_id], true);
                         error_log($message);
                     }
                     //endregion
