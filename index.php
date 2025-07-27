@@ -162,7 +162,7 @@ function genpdf_add_extra_order_meta($order_id)
                             if (!empty($value) && floatval($value) > 0) {
                                 match ($key) {
                                     "importo_gennaio" => $array_product_metadata['importo_mese']['gennaio'] = $value,
-                                    "importo_febbrario" => $array_product_metadata['importo_mese']['febbraio'] = $value,
+                                    "importo_febbraio" => $array_product_metadata['importo_mese']['febbraio'] = $value,
                                     "importo_marzo" => $array_product_metadata['importo_mese']['marzo'] = $value,
                                     "importo_aprile" => $array_product_metadata['importo_mese']['aprile'] = $value,
                                     "importo_maggio" => $array_product_metadata['importo_mese']['maggio'] = $value,
