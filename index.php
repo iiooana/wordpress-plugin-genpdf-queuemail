@@ -143,7 +143,7 @@ function genpdf_add_extra_order_meta($order_id)
                             ['%d', '%d']
                         );
                     } else {
-                        $message = var_export(['message' => 'Errore non trovo il template per product_id.', 'product_id' => $id_product], true);
+                        $message = var_export(['message' => 'Errore non trovo il template impostato.', 'product_id' => $id_product, 'order_id' => $order_id], true);
                         error_log($message);
                     }
                     //endregion
@@ -214,14 +214,14 @@ function genpdf_buttons_orders($actions, $order)
                 if (!empty($item['meta_value']) && json_validate($item['meta_value'])) {
                     $product = json_decode($item['meta_value'], ARRAY_A);
                     $titolo_del_corso = $product['titolo_corso_pdf'];
-                    if (strlen($titolo_del_corso) > 10) {
+                     if (strlen($titolo_del_corso) > 10) {
                         $titolo_del_corso = substr($titolo_del_corso, 0, 13) . "...";
                     }
                     if (!empty($product['titolo_corso_pdf']) && !empty($product['product_id'])) {
                         $actions[] = [
                             'url'    => admin_url('admin.php?page=genpdf_download_pdf&order_id=' . $order->id . "&product_id=" . $product['product_id']),
-                            'name'   => '📥 ' . esc_attr($titolo_del_corso),
-                            'title' => esc_attr($product['titolo_corso'] ?: $product['titolo_corso_pdf']),
+                            'name'   => '📥 ' . strtoupper(esc_attr($titolo_del_corso)),
+                            'title' => strtoupper(esc_attr($product['titolo_corso'] ?: $product['titolo_corso_pdf'])),
                             'action' => 'genpdf_btn_download'
                         ];
                     }

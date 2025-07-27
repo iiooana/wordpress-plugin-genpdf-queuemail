@@ -160,7 +160,7 @@ class OrderGenPDF
                         $order_data['tabella_extra'] = self::getHTMLTabellaExtra($product);
                         //endregion
                         $order_data['titolo_corso_pdf'] = $product['titolo_corso_pdf'];
-                        $order_data['giorno_generico_settimana'] = $product['giorno_generico_settimana'];
+                        $order_data['giorno_generico_settimana'] = $product['giorno_generico_settimana'] ?? '';
                         $order_data['anno_accademico'] = $product['anno_accademico'];
                         $order_data['luogo_del_corso'] = !empty($product['luogo_del_corso']) ?  $order_data['luogo_del_corso'] = $order_data['luogo'] = ucfirst($product['luogo_del_corso']) : '';
 
@@ -248,8 +248,8 @@ class OrderGenPDF
     private function getbase64Signature()
     {
         global $wpdb;
-        $query = $wpdb->prepare("SELECT ID FROM  ". $wpdb->base_prefix."posts where ID = 
-        ( SELECT meta_value FROM ". $wpdb->base_prefix."postmeta WHERE post_id=%d and meta_key=%s limit 1 ) AND post_type=%s limit 1 ", [$this->order_id, 'signpad', 'attachment']);
+        $query = $wpdb->prepare("SELECT ID FROM  " . $wpdb->base_prefix . "posts where ID = 
+        ( SELECT meta_value FROM " . $wpdb->base_prefix . "postmeta WHERE post_id=%d and meta_key=%s limit 1 ) AND post_type=%s limit 1 ", [$this->order_id, 'signpad', 'attachment']);
         $row = $wpdb->get_row($query, ARRAY_A);
         if (!empty($row) && !empty($row['ID'])) {
             $meta = get_post_meta($row['ID'], '_wp_attached_file');
