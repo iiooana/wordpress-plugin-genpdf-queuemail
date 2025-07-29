@@ -78,7 +78,7 @@ class OrderGenPDF
             if (!empty($customer_address['company'])  && strlen(trim($customer_address['company'])) > 0) {
                 $order_data['ragione_sociale'] = $customer_address['company'];
             }
-            //endregion           
+            //endregion
         }
         //endregion
 
@@ -174,7 +174,7 @@ class OrderGenPDF
 
                         //region acconto or totale
                         if (!empty($product['acconto_o_totale']) && is_string($product['acconto_o_totale']) && strpos(strtolower($product['acconto_o_totale']), 'acconto') !== false) {
-                            $order_data['importo_acconto']  = number_format($product['importo_totale'], 2, ",");
+                            $order_data['importo_acconto']  = number_format($product['importo_totale'], 2, ",",".");
                             $totale = floatval($product['importo_totale']);
                             //region months
                             if (!empty($product['importo_mese'])) {
@@ -184,15 +184,15 @@ class OrderGenPDF
                                     if (is_float($price) || is_numeric($price)) {
                                         $totale += floatval($price);
                                         $order_data['td_mesi_nome'] .= '<td class="destra">' . strtoupper($nome_mese) . '</td>';
-                                        $order_data['td_mesi_importi'] .= '<td class="destra">€ ' . number_format($price, 2, ",") . '</td>';
+                                        $order_data['td_mesi_importi'] .= '<td class="destra">€ ' . number_format($price, 2, ",",".") . '</td>';
                                     }
                                 }
                             }
                             //endregion
-                            $order_data['importo_totale'] = number_format($totale, 2, ",");
+                            $order_data['importo_totale'] = number_format($totale, 2, ",",".");
                         } else {
                             $order_data['importo_acconto'] = 0;
-                            $order_data['importo_totale'] = number_format($product['importo_totale'], 2, ",");
+                            $order_data['importo_totale'] = number_format($product['importo_totale'], 2, ",",".");
                         }
                         //endregion
                         break;
@@ -327,7 +327,7 @@ class OrderGenPDF
     }
 
     /**
-     * magic method 
+     * magic method
      */
     public function __get($name)
     {
