@@ -80,8 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['genpdf_settings_value
         }
 
         // Log per debug
-        error_log('GenPDF: Impostazioni inviate: ' . print_r($_POST, true));
-        error_log('GenPDF: Errori: ' . print_r($errors, true));
+        //error_log('GenPDF: Impostazioni inviate: ' . print_r($_POST, true));
+        //error_log('GenPDF: Errori: ' . print_r($errors, true));
         error_log('GenPDF: Notifica impostata: ' . (empty($errors) ? 'success' : 'error'));
     }
 }

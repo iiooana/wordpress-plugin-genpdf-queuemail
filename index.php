@@ -221,7 +221,7 @@ function genpdf_buttons_orders($actions, $order)
                     if (!empty($product['titolo_corso']) && !empty($product['product_id'])) {
                         $actions[] = [
                             'url'    => admin_url('admin.php?page=genpdf_download_pdf&order_id=' . $order->id . "&product_id=" . $product['product_id']),
-                            'name'   => 'ðŸ“¥ ' . strtoupper(esc_attr($titolo_del_corso) ?? 'Scarica PDF'),
+                            'name'   => '📥 ' . strtoupper(esc_attr($titolo_del_corso) ?? 'Scarica PDF'),
                             'title' => strtoupper(esc_attr($product['titolo_corso']) ?? 'Scarica PDF'),
                             'action' => 'genpdf_btn_download'
                         ];
