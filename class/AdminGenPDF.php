@@ -139,7 +139,7 @@ class AdminGenPDF
                         if (filter_var($item, FILTER_VALIDATE_EMAIL) === FALSE) {
                             $is_valid = false; ?>
                             <div class="notice notice-error is-dismissible">
-                                ERROR: The email is not valid <?= $item ?>
+                                ERROR: The email is not valid <?=esc_attr($item) ?>
                             </div>
 <? }
                     }
