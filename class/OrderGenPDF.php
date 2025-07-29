@@ -173,7 +173,7 @@ class OrderGenPDF
                         $order_data['condizioni_di_pagamento'] = self::getCondizioniDiPagamento($product['acconto_o_totale']) ?? '';
 
                         //region acconto or totale
-                        if (!empty($product['acconto_o_totale']) && strpos($product['acconto_o_totale'], 'acconto') !== false) {
+                        if (!empty($product['acconto_o_totale']) && is_string($product['acconto_o_totale']) && strpos(strtolower($product['acconto_o_totale']), 'acconto') !== false) {
                             $order_data['importo_acconto']  = number_format($product['importo_totale'], 2, ",");
                             $totale = floatval($product['importo_totale']);
                             //region months
@@ -270,7 +270,7 @@ class OrderGenPDF
         $tmp['body'] = [];
         if (!empty($product['tabella_extra']) && is_array($product['tabella_extra'])) {
             foreach ($product['tabella_extra'] as $column_name => $value) {
-                if (!empty($value[0])) {
+                if (!empty($value)) {
                     switch ($column_name) {
                         case "has_column_where":
                             $tmp['header'][] = '<th style="color: #fff;text-align: center;font-size:14pt;">DOVE</th>';
