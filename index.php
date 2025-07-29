@@ -204,6 +204,7 @@ add_action('woocommerce_checkout_update_order_meta', 'genpdf_add_extra_order_met
  */
 function genpdf_buttons_orders($actions, $order)
 {
+   
     $timestamp =  $order->date_created->getTimestamp();
     $array_status = OrderEmailGenPDF::getListAcceptsStatus();
     if (!empty($timestamp) && $timestamp > 1745843280) {
@@ -213,15 +214,15 @@ function genpdf_buttons_orders($actions, $order)
             foreach ($products as $item) {
                 if (!empty($item['meta_value']) && json_validate($item['meta_value'])) {
                     $product = json_decode($item['meta_value'], ARRAY_A);
-                    $titolo_del_corso = $product['titolo_corso_pdf'];
+                    $titolo_del_corso = $product['titolo_corso'];
                     if (strlen($titolo_del_corso) > 10) {
                         $titolo_del_corso = substr($titolo_del_corso, 0, 13) . "...";
                     }
-                    if (!empty($product['titolo_corso_pdf']) && !empty($product['product_id'])) {
+                    if (!empty($product['titolo_corso']) && !empty($product['product_id'])) {
                         $actions[] = [
                             'url'    => admin_url('admin.php?page=genpdf_download_pdf&order_id=' . $order->id . "&product_id=" . $product['product_id']),
-                            'name'   => '📥 ' . strtoupper(esc_attr($titolo_del_corso)),
-                            'title' => strtoupper(esc_attr($product['titolo_corso'] ?: $product['titolo_corso_pdf'])),
+                            'name'   => 'ðŸ“¥ ' . strtoupper(esc_attr($titolo_del_corso) ?? 'Scarica PDF'),
+                            'title' => strtoupper(esc_attr($product['titolo_corso']) ?? 'Scarica PDF'),
                             'action' => 'genpdf_btn_download'
                         ];
                     }
@@ -312,8 +313,7 @@ function hasPermissionAdminGenPDF()
     $user = wp_get_current_user();
     $user_roles = $user->roles;
     return (
-        is_admin() ||
-        (!empty($user_roles) && is_string($user_roles) && $user_roles == 'shop_manager') ||
-        (!empty($user_roles) && is_array($user_roles) && in_array('shop_manager', $user_roles))
+        is_admin() || 
+        (!empty($user_roles) && in_array('shop_manager',$user_roles))
     );
 }

@@ -57,7 +57,7 @@ class AdminGenPDF
             null,
             __('Download PDF', 'genpdf-woocommerce'),
             __('Download PDF', 'genpdf-woocommerce'),
-            'manage_options',
+            'manage_woocommerce',
             'genpdf_download_pdf',
             'genpdf_download_pdf'
         );
@@ -65,10 +65,11 @@ class AdminGenPDF
             null,
             __('Send attachments', 'genpdf-woocommerce'),
             __('Send attachments', 'genpdf-woocommerce'),
-            'manage_options',
+            'manage_woocommerce',
             'genpdf_send_attachments',
             'genpdf_send_attachments',
         );
+
     }
     public static function register_post_type()
     {
