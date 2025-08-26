@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: Generate PDF
- * Description: Generete PDF from customer data and product data. Manage the queue of emails with attachments.
+ * Description: Generate PDF from customer data and product data. Manage the queue of emails with attachments.
  * Version: 0.4.9
  * Author: Ioana
  * Text Domain: genpdf-woocommerce
@@ -215,6 +215,9 @@ function genpdf_buttons_orders($actions, $order)
                 if (!empty($item['meta_value']) && json_validate($item['meta_value'])) {
                     $product = json_decode($item['meta_value'], ARRAY_A);
                     $titolo_del_corso = $product['titolo_corso'];
+                    if(boolval($product['titolo_corso']) == false && boolval($product['titolo_corso_pdf']) === true){
+						$product['titolo_corso'] = $product['titolo_corso_pdf'];
+					}
                     if (strlen($titolo_del_corso) > 10) {
                         $titolo_del_corso = substr($titolo_del_corso, 0, 13) . "...";
                     }
