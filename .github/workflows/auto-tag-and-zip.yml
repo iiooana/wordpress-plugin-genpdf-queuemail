@@ -68,6 +68,9 @@ jobs:
         with:
           tag_name: ${{ steps.plugin_version.outputs.tag }}
           name: "${{ steps.plugin_version.outputs.tag }}"
+          body: |
+            ## Changelog
+            [Visualizza tutte le release e il changelog su GitHub](${{ github.server_url }}/${{ github.repository }}/releases)
           files: ${{ github.event.repository.name }}-${{ steps.plugin_version.outputs.tag }}.zip
           generate_release_notes: true
         env:
