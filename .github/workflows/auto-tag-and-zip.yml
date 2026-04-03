@@ -1,0 +1,71 @@
+name: Auto Tag & Build ZIP
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'index.php'
+
+jobs:
+  tag-and-zip:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Estrai versione dal plugin header
+        id: plugin_version
+        run: |
+          VERSION=$(grep -m1 '^ \* Version:' index.php | sed 's/.*Version:\s*//' | tr -d '[:space:]')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+          echo "Versione rilevata: $VERSION"
+
+      - name: Verifica se il tag esiste già
+        id: check_tag
+        run: |
+          TAG="v${{ steps.plugin_version.outputs.version }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag $TAG già esistente, skip."
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Tag $TAG non trovato, procedo."
+          fi
+
+      - name: Installa dipendenze Composer (no dev)
+        if: steps.check_tag.outputs.exists == 'false'
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Crea ZIP
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY##*/}"
+          mkdir -p /tmp/$REPO_NAME
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='composer.json' \
+            --exclude='composer.lock' \
+            --exclude='readme.md' \
+            ./ /tmp/$REPO_NAME/
+          cd /tmp
+          zip -r "$GITHUB_WORKSPACE/${REPO_NAME}-${{ steps.plugin_version.outputs.tag }}.zip" "$REPO_NAME"
+
+      - name: Crea release con ZIP allegato
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.plugin_version.outputs.tag }}
+          name: "${{ steps.plugin_version.outputs.tag }}"
+          files: ${{ github.event.repository.name }}-${{ steps.plugin_version.outputs.tag }}.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
