@@ -2,12 +2,12 @@
 /*
  * Plugin Name: Generate PDF
  * Description: Generate PDF from customer data and product data. Manage the queue of emails with attachments.
- * Version: 0.4.9
+ * Version: 0.4.10
  * Author: Ioana
  * Text Domain: genpdf-woocommerce
  * Domain Path: /languages
  * Requires PHP: 8.3
- * Requires at least: 6.0 
+ * Requires at least: 6.0
  */
 
 
@@ -320,3 +320,13 @@ function hasPermissionAdminGenPDF()
         (!empty($user_roles) && in_array('shop_manager',$user_roles))
     );
 }
+
+// GitHub Auto Updater
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-github-plugin-updater.php';
+
+$genpdf_updater = new GitHub_Plugin_Updater([
+    'owner'       => '2mcreations',
+    'repo'        => 'wordpress-plugin-genpdf-queuemail',
+    'plugin_file' => 'wordpress-plugin-genpdf-queuemail/index.php',
+    'slug'        => 'wordpress-plugin-genpdf-queuemail',
+]);
