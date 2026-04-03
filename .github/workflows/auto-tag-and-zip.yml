@@ -1,16 +1,19 @@
 name: Auto Tag & Build ZIP
 
 on:
-  push:
+  workflow_run:
+    workflows:
+      - "SonarCloud Code Analysis"
+    types:
+      - completed
     branches:
       - main
       - master
-    paths:
-      - 'index.php'
 
 jobs:
   tag-and-zip:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
       contents: write
 
@@ -61,7 +64,7 @@ jobs:
 
       - name: Crea release con ZIP allegato
         if: steps.check_tag.outputs.exists == 'false'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@da05d55563e6716b8791fd4c4278c90d7bad1281
         with:
           tag_name: ${{ steps.plugin_version.outputs.tag }}
           name: "${{ steps.plugin_version.outputs.tag }}"
