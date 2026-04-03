@@ -64,7 +64,7 @@ jobs:
 
       - name: Crea release con ZIP allegato
         if: steps.check_tag.outputs.exists == 'false'
-        uses: softprops/action-gh-release@da05d55563e6716b8791fd4c4278c90d7bad1281 # v2.2.2
+        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe # v2.6.1
         with:
           tag_name: ${{ steps.plugin_version.outputs.tag }}
           name: "${{ steps.plugin_version.outputs.tag }}"
