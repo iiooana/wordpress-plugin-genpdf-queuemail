@@ -19,7 +19,7 @@ class GitHub_Plugin_Updater {
         $this->plugin_slug  = $config['slug'] ?? $config['repo'];
         $this->cache_time   = $config['cache_time'] ?? 43200; // 12 ore
         $this->api_url      = 'https://api.github.com/repos/' . $this->owner . '/' . $this->repo . '/releases/latest';
-        $this->transient_key = 'gh_updater_' . md5( $this->repo );
+        $this->transient_key = 'gh_updater_' . substr( hash( 'sha256', $this->repo ), 0, 20 );
 
         add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check_update' ] );
         add_filter( 'plugins_api',                           [ $this, 'plugin_info' ], 10, 3 );

@@ -324,7 +324,7 @@ function hasPermissionAdminGenPDF()
 // GitHub Auto Updater
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-github-plugin-updater.php';
 
-new GitHub_Plugin_Updater([
+$genpdf_updater = new GitHub_Plugin_Updater([
     'owner'       => '2mcreations',
     'repo'        => 'wordpress-plugin-genpdf-queuemail',
     'plugin_file' => 'wordpress-plugin-genpdf-queuemail/index.php',
